@@ -1,0 +1,1034 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap — Travel slow, go Offmap!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Grenze+Gotisch:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---------------------------------------------------------------- */
+        /* BRAND DESIGN SYSTEM & ROOT VARIABLES (Inspired by Reference Images) */
+        /* ---------------------------------------------------------------- */
+        :root {
+            --forest-green: #3B533E;     /* Inspired by Alpina & Augusta Greens from Moodboard */
+            --olive-drab: #5B6E58;
+            --sand-beige: #E6DFD3;      /* Torn cardboard/scrapbook cream texture base */
+            --warm-cream: #FDFBF7;
+            --charcoal: #242926;
+            --muted-gold: #D2A665;       /* Earthy Ochre accent */
+            --accent-orange: #E06A3B;   /* Terracotta scribble accent color */
+            --white: #FFFFFF;
+            
+            --font-display: 'Grenze Gotisch', serif;
+            --font-accent: 'Almendra Display', serif;
+            --font-body: 'Jost', sans-serif;
+            --font-scribble: 'Caveat', cursive;
+            
+            --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Typography & Custom Brand Headings */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.1;
+            color: var(--forest-green);
+        }
+
+        p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.8;
+            color: rgba(36, 41, 38, 0.85);
+        }
+
+        .section-tag {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Dynamic Scribble Style Overlays (Image 4 & 10) */
+        .scribble-text {
+            font-family: var(--font-scribble);
+            color: var(--accent-orange);
+            font-size: 2rem;
+            line-height: 1;
+            transform: rotate(-3deg);
+            display: inline-block;
+        }
+
+        /* Layout Utilities */
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 5rem;
+        }
+
+        @media (max-width: 992px) { .container { padding: 0 2rem; } }
+
+        /* Raw Torn/Paper Edge Mask Dividers (Image 3, 4, 5, 10) */
+        .torn-divider-bottom {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23E6DFD3'/%3E%3C/svg%3E");
+            background-size: 100% 50px;
+            transform: rotate(180deg);
+        }
+
+        .torn-divider-top {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23FDFBF7'/%3E%3C/svg%3E");
+            background-size: 100% 50px;
+        }
+
+        /* Interactive Scrapbook Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.6rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            position: relative;
+            z-index: 1;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            box-shadow: 0 4px 0 var(--charcoal);
+        }
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 0 var(--charcoal);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--warm-cream);
+            border: 2px dashed rgba(253, 251, 247, 0.5);
+        }
+        .btn-secondary:hover {
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            border-style: solid;
+            transform: translateY(-4px) rotate(1deg);
+        }
+
+        /* Scroll Animation States */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 1: GLOBAL STICKY HEADER & COMPASS NAVIGATION            */
+        /* ---------------------------------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 2rem 0;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled {
+            padding: 1rem 0;
+            background-color: rgba(253, 251, 247, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px var(--charcoal) dashed;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+        }
+        .logo-brand-img {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--warm-cream);
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .logo-brand-img {
+            border-color: var(--forest-green);
+        }
+
+        .logo-text {
+            font-family: var(--font-accent);
+            font-size: 1.8rem;
+            color: var(--warm-cream);
+        }
+        .navbar.scrolled .logo-text { color: var(--forest-green); }
+        
+        .navbar-content-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            list-style: none;
+        }
+        .nav-menu a {
+            font-size: 0.9rem;
+            color: var(--warm-cream);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .nav-menu a { color: var(--charcoal); }
+        .nav-menu a:hover { color: var(--muted-gold) !important; }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 2: IMMERSIVE CLOUD-OVERLAY HERO                         */
+        /* ---------------------------------------------------------------- */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--charcoal);
+        }
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 115%;
+            background: linear-gradient(to bottom, rgba(36,41,38,0.3), rgba(36,41,38,0.7)), 
+                        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80') center no-repeat;
+            background-size: cover;
+            will-change: transform;
+        }
+        .hero-content { position: relative; z-index: 5; max-width: 850px; }
+        .hero h1 { font-size: clamp(3.5rem, 8vw, 6.5rem); color: var(--warm-cream); margin-bottom: 1.5rem; }
+        .hero p { color: rgba(253, 251, 247, 0.9); margin-bottom: 3rem; max-width: 650px; font-size: 1.2rem; }
+        .hero-btn-group { display: flex; gap: 1.5rem; }
+
+        /* Brand Cloud Floating Watermark Emblem Overlay */
+        .cloud-badge-watermark {
+            position: absolute;
+            right: 8%;
+            bottom: 15%;
+            width: 180px;
+            height: 180px;
+            z-index: 6;
+            animation: floatSlow 6s ease-in-out infinite;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.3));
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+
+        @media (max-width: 768px) {
+            .cloud-badge-watermark { width: 110px; height: 110px; right: 5%; bottom: 8%; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 3: THE SCRAPBOOK PHILOSOPHY (POLAROID DECK)              */
+        /* ---------------------------------------------------------------- */
+        .about { padding: 12rem 0; background-color: var(--sand-beige); position: relative; }
+        .about-split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: center; }
+        .about-text h2 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 2rem; }
+        
+        .scrapbook-container {
+            position: relative;
+            width: 100%;
+            height: 520px;
+        }
+        /* Custom Polaroid Picture Framing Modules (Image 3 & 5) */
+        .scrapbook-paper {
+            position: absolute;
+            background-color: var(--white);
+            padding: 16px 16px 48px 16px;
+            box-shadow: -5px 15px 35px rgba(0,0,0,0.15);
+            transition: var(--transition-bounce);
+            cursor: grab;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .scrapbook-paper img { width: 100%; height: 100%; object-fit: cover; filter: sepia(15%); }
+        .scrapbook-paper .caption {
+            font-family: var(--font-scribble);
+            color: var(--forest-green);
+            margin-top: 14px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        .paper-1 { width: 290px; height: 350px; top: 0; left: 5%; transform: rotate(-5deg); z-index: 3; }
+        .paper-2 { width: 310px; height: 370px; top: 70px; right: 5%; transform: rotate(6deg); z-index: 2; }
+        .paper-3 { width: 250px; height: 310px; bottom: -30px; left: 25%; transform: rotate(-10deg); z-index: 1; }
+        
+        .scrapbook-paper:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            z-index: 10 !important;
+            box-shadow: 0 30px 60px rgba(36, 41, 38, 0.3);
+        }
+
+        @media (max-width: 992px) {
+            .about-split { grid-template-columns: 1fr; gap: 5rem; }
+            .scrapbook-container { height: 460px; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 4: MASONRY STREAMFLOWS (ASYSMMETRIC BREAKERS)           */
+        /* ---------------------------------------------------------------- */
+        .journeys { padding: 12rem 0; background-color: var(--warm-cream); position: relative; }
+        .journeys-header { text-align: center; margin-bottom: 8rem; position: relative; }
+        .journeys-header h2 { font-size: clamp(2.8rem, 6vw, 4.5rem); }
+
+        .streamflow-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2.5rem;
+            row-gap: 14rem;
+        }
+        .stream-card {
+            position: relative;
+            background: transparent;
+            transition: var(--transition-smooth);
+        }
+        .card-left { grid-column: 1 / span 6; }
+        .card-right { grid-column: 7 / span 6; margin-top: 8rem; }
+        .card-full { grid-column: 2 / span 10; margin-top: 4rem; }
+
+        .stream-img-wrapper {
+            width: 100%;
+            height: 520px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 4px;
+            box-shadow: 0 25px 50px rgba(59,83,62,0.12);
+        }
+        .stream-img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .stream-card:hover .stream-img-wrapper img { transform: scale(1.07); }
+
+        /* Overlapping Content Board Sheets (Image 4 & 5) */
+        .stream-info-banner {
+            position: absolute;
+            bottom: -60px;
+            right: -20px;
+            background: var(--white);
+            padding: 3rem;
+            width: 80%;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.08);
+            border-top: 5px solid var(--muted-gold);
+            z-index: 5;
+            transition: var(--transition-bounce);
+        }
+        .stream-card:hover .stream-info-banner {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(36,41,38,0.15);
+        }
+        .stream-info-banner h3 { font-size: 2rem; margin-bottom: 0.8rem; }
+        
+        .tag-badge {
+            position: absolute; top: 20px; left: 20px;
+            background: var(--charcoal); color: var(--warm-cream);
+            padding: 6px 16px; font-size: 0.8rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            z-index: 6;
+        }
+
+        /* Handwritten Overlay Graphic Scribbles inside section */
+        .handdrawn-circle-overlay {
+            position: absolute;
+            bottom: -40px;
+            left: -30px;
+            width: 160px;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        @media (max-width: 992px) {
+            .streamflow-grid { grid-template-columns: 1fr; gap: 10rem; }
+            .stream-card { grid-column: auto !important; margin-top: 0 !important; }
+            .stream-img-wrapper { height: 400px; }
+            .stream-info-banner { width: 100%; right: 0; bottom: -50px; padding: 2rem; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 5: TOPOGRAPHIC TRACK MAPPER (INTERACTIVE LAB)            */
+        /* ---------------------------------------------------------------- */
+        .pathfinder {
+            padding: 12rem 0;
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            position: relative;
+            overflow: hidden;
+        }
+        .pathfinder h2 { color: var(--warm-cream); font-size: clamp(2.5rem, 5vw, 4rem); text-align: center; margin-bottom: 1rem; }
+        .pathfinder-subtitle { text-align: center; color: rgba(253, 251, 247, 0.7); margin-bottom: 6rem; font-size: 1.2rem; }
+
+        .map-interactive-wrapper {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        /* Visual Topography Map Grid Layer Simulation (Image 2, 6 & 8) */
+        .map-vector-frame {
+            position: relative;
+            background: rgba(253, 251, 247, 0.04);
+            border: 2px dashed rgba(253, 251, 247, 0.15);
+            height: 500px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
+        }
+        .map-svg-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .map-node {
+            position: absolute;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: var(--forest-green);
+            border: 3px solid var(--muted-gold);
+            color: var(--muted-gold);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-accent);
+            font-size: 1.3rem; font-weight: bold; cursor: pointer;
+            z-index: 5;
+            transition: var(--transition-bounce);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .map-node:hover, .map-node.active {
+            background: var(--muted-gold);
+            color: var(--forest-green);
+            transform: scale(1.25);
+            box-shadow: 0 0 30px var(--muted-gold);
+        }
+        .node-1 { top: 25%; left: 15%; }
+        .node-2 { top: 68%; left: 38%; }
+        .node-3 { top: 32%; left: 68%; }
+        .node-4 { top: 75%; left: 85%; }
+
+        /* Description Cards Display Engine */
+        .pathfinder-display-panel {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4rem;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+        .panel-content { display: none; animation: panelSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .panel-content.active { display: block; }
+
+        @keyframes panelSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .panel-content h4 { color: var(--muted-gold); font-size: 2.2rem; margin-bottom: 1.2rem; }
+        .panel-content p { color: rgba(253, 251, 247, 0.9); font-size: 1.15rem; }
+
+        @media (max-width: 992px) {
+            .map-interactive-wrapper { grid-template-columns: 1fr; gap: 4rem; }
+            .map-vector-frame { height: 380px; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 6: THE ARCHIVE LOGS (EDITORIAL STAGGER GRID)             */
+        /* ---------------------------------------------------------------- */
+        .testimonials { padding: 12rem 0; background-color: var(--sand-beige); position: relative; }
+        .testimonials h2 { text-align: center; font-size: clamp(2.6rem, 5vw, 4rem); margin-bottom: 7rem; }
+
+        .staggered-track {
+            display: flex;
+            gap: 3rem;
+        }
+        .track-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+        /* Continuous layout stagger offsets (Image 11) */
+        .track-column:nth-child(2) { transform: translateY(60px); }
+
+        .journal-card {
+            background: var(--white);
+            padding: 3.5rem;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(36,41,38,0.05);
+            border-radius: 4px;
+            transition: var(--transition-smooth);
+        }
+        .journal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(36,41,38,0.1);
+        }
+        .journal-card p { font-family: var(--font-display); font-style: italic; font-size: 1.5rem; margin-bottom: 2rem; color: var(--forest-green); line-height: 1.4; }
+        
+        .journal-meta { display: flex; align-items: center; gap: 1.2rem; }
+        .journal-meta img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--muted-gold); }
+        .journal-meta h5 { font-size: 1rem; font-weight: 600; color: var(--charcoal); letter-spacing: 1px; }
+
+        @media (max-width: 768px) {
+            .staggered-track { flex-direction: column; gap: 3rem; }
+            .track-column:nth-child(2) { transform: translateY(0); }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 7: COORDINATES PLANNER & BASELINE ELEMENT                */
+        /* ---------------------------------------------------------------- */
+        .footer { background-color: var(--charcoal); color: var(--warm-cream); padding: 12rem 0 4rem 0; position: relative; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8rem; margin-bottom: 8rem; }
+        .footer-cta h2 { color: var(--warm-cream); font-size: clamp(2.8rem, 6vw, 4.5rem); margin-bottom: 2rem; }
+        .footer-cta p { color: rgba(253, 251, 247, 0.7); font-size: 1.2rem; margin-bottom: 2.5rem; }
+        
+        .interactive-form { display: flex; flex-direction: column; gap: 2.5rem; }
+        .form-row { position: relative; }
+        
+        .interactive-form input, .interactive-form select {
+            width: 100%; padding: 1.2rem 0; background: transparent; border: none;
+            border-bottom: 2px dashed rgba(253, 251, 247, 0.2); color: var(--warm-cream);
+            font-family: var(--font-body); font-size: 1.1rem; outline: none; transition: 0.4s;
+        }
+        .interactive-form input:focus, .interactive-form select:focus { border-bottom-color: var(--muted-gold); border-bottom-style: solid; }
+        .interactive-form label { position: absolute; top: 1.2rem; left: 0; color: rgba(253, 251, 247, 0.4); pointer-events: none; transition: 0.3s; font-size: 1.05rem; }
+        
+        .interactive-form input:focus ~ label,
+        .interactive-form input:not(:placeholder-shown) ~ label {
+            top: -1rem; font-size: 0.85rem; color: var(--muted-gold); letter-spacing: 1px;
+        }
+
+        .footer-bottom { border-top: 1px dashed rgba(253, 251, 247, 0.15); padding-top: 4rem; display: flex; justify-content: space-between; align-items: center; }
+        .footer-bottom p { font-size: 0.95rem; color: rgba(253, 251, 247, 0.4); }
+        
+        .socials { display: flex; gap: 2.5rem; list-style: none; }
+        .socials a { color: rgba(253, 251, 247, 0.5); text-decoration: none; font-size: 0.95rem; letter-spacing: 1px; transition: 0.3s; }
+        .socials a:hover { color: var(--muted-gold); }
+
+        @media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr; gap: 5rem; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container navbar-content-flex">
+            <a href="#" class="logo-container">
+                <img src="/Users/Lappy Nation/Downloads/logo-removebg-preview.png" alt="OffMap Logo Symbol" class="logo-brand-img">
+                <span class="logo-text">offmap.in</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#philosophy">Philosophy</a></li>
+                <li><a href="#trajectories">Trajectories</a></li>
+                <li><a href="#explorer">Pathfinder</a></li>
+                <li><a href="#plotter">Plan Route</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-bg" id="hero-parallax-target"></div>
+        <img src="/Users/Lappy Nation/Downloads/logo-removebg-preview.png" alt="Floating Cloud Asset" class="cloud-badge-watermark">
+        
+        <div class="container">
+            <div class="hero-content">
+                <span class="section-tag" style="color: var(--muted-gold);">Vagabonding Manifesto</span>
+                <h1>Travel slow, go Offmap!</h1>
+                <p>OffMap is designed for those seeking to unplug entirely. Hike without tracking intervals, watch the changing light across mountain basins, and settle into landscapes deeply.</p>
+                <div class="hero-btn-group">
+                    <a href="#trajectories" class="btn btn-primary">Enter the Stream</a>
+                    <a href="#plotter" class="btn btn-secondary">Plot Coordinates</a>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom"></div>
+    </header>
+
+    <section class="about" id="philosophy">
+        <div class="container">
+            <div class="about-split">
+                <div class="about-text reveal">
+                    <span class="section-tag">01 // The Manifesto</span>
+                    <h2>We don’t make trips around sightseeing.</h2>
+                    <p style="font-size: 1.4rem; font-family: var(--font-display); color: var(--forest-green); margin-bottom: 2rem; line-height: 1.4;">
+                        We curate slow drifts. No standard tourist itineraries—just organic flow.
+                    </p>
+                    <p style="margin-bottom: 2rem;">
+                        Standard modern tourism accelerates your pace until environments blur together. We turn backward. We spend more time in fewer locations, connect authentically with local subcultures, and experience terrain elements deeply before mapping a departure trail.
+                    </p>
+                    <span class="scribble-text">* Completely open tracking lines</span>
+                </div>
+                
+                <div class="scrapbook-container reveal">
+                    <div class="scrapbook-paper paper-1">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80" alt="Alps Basin Ridge">
+                        <div class="caption">Alps Ridge Drift // 04</div>
+                    </div>
+                    <div class="scrapbook-paper paper-2">
+                        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80" alt="Riverbed stream flow">
+                        <div class="caption">Mist Valley Woodlands</div>
+                    </div>
+                    <div class="scrapbook-paper paper-3">
+                        <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=500&q=80" alt="High valley trail tracking">
+                        <div class="caption">Archaic Trajectories</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23FDFBF7'/%3E%3C/svg%3E&quot;); transform: none;"></div>
+    </section>
+
+    <!-- option 1  start-->
+    <section class="hero-scrapbook" style="position: relative; background: #ebdcb9; min-height: 100vh; display: flex; align-items: center; overflow: hidden; padding: 120px 20px 60px;">
+    <div class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; opacity: 0.35; pointer-events: none; transform: scale(1.05); transition: transform 0.8s ease-out;"></div>
+    
+    <div class="torn-edge-bottom" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: url('data:image/svg+xml;utf8,<svg viewBox=0 0 1200 120 preserveAspectRatio=none xmlns=http://www.w3.org/2000/svg fill=%232d3a22><path d=M0,90 Q150,110 300,85 T600,95 T900,75 T1200,100 L1200,120 L0,120 Z/></svg>') bottom/100% 100% no-repeat; z-index: 10;"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 5;">
+        
+        <div class="hero-content" style="opacity: 0; transform: translateY(30px); animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;">
+            <div class="brand-badge" style="font-family: 'Caveat', cursive; color: #e67e22; font-size: 1.8rem; margin-bottom: 10px; transform: rotate(-3deg); display: inline-block;">
+                Travel slow, go Offmap!
+            </div>
+            <h1 style="font-family: 'Grenze Gotisch', serif; font-size: clamp(3.5rem, 6vw, 5.5rem); color: #2d3a22; line-height: 0.9; margin-bottom: 25px;">
+                Ditch the <span style="text-decoration: line-through; color: #8c906c; font-size: 0.8em;">Itinerary</span>.<br>Find the Flow.
+            </h1>
+            <p style="font-family: 'Almendra Display', serif; font-size: 1.25rem; color: #4a3e2c; max-width: 480px; line-height: 1.6; margin-bottom: 35px;">
+                OffMap is for those who crave to sit with a view longer, hike without rushing, and experience remote locations deeply before the rest of the world arrives.
+            </p>
+            <div class="hero-actions" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <a href="#journeys" class="btn-primary" style="background: #2d3a22; color: #ebdcb9; padding: 15px 32px; font-family: 'Grenze Gotisch', serif; font-size: 1.3rem; text-decoration: none; border-radius: 4px; box-shadow: 4px 4px 0px #8c906c; transition: all 0.3s ease;">Explore Slow Trips</a>
+                <a href="#planner" class="btn-secondary" style="background: transparent; border: 2px dashed #2d3a22; color: #2d3a22; padding: 13px 30px; font-family: 'Grenze Gotisch', serif; font-size: 1.3rem; text-decoration: none; border-radius: 4px; transition: all 0.3s ease;">Plan Custom Custom Inquiry</a>
+            </div>
+        </div>
+
+        <div class="hero-graphics" style="position: relative; height: 500px; display: flex; justify-content: center; align-items: center;">
+            
+            <div class="polaroid-frame" style="position: absolute; width: 240px; background: #fff; padding: 12px 12px 35px 12px; box-shadow: 0 12px 28px rgba(0,0,0,0.15); transform: rotate(-12deg) translate(-40px, -30px); transition: transform 0.5s ease; cursor: pointer;" onmouseover="this.style.transform='rotate(-6deg) scale(1.05) translate(-40px, -30px)'" onmouseout="this.style.transform='rotate(-12deg) translate(-40px, -30px)'">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80" alt="Mountain valley" style="width: 100%; height: 200px; object-fit: cover;">
+                <div style="font-family: 'Caveat', cursive; font-size: 1.3rem; text-align: center; margin-top: 12px; color: #333;">Hidden Passes</div>
+            </div>
+
+            <div class="polaroid-frame" style="position: absolute; width: 250px; background: #fff; padding: 12px 12px 35px 12px; box-shadow: 0 16px 35px rgba(0,0,0,0.2); transform: rotate(8deg) translate(30px, 20px); z-index: 2; transition: transform 0.5s ease; cursor: pointer;" onmouseover="this.style.transform='rotate(2deg) scale(1.05) translate(30px, 20px)'" onmouseout="this.style.transform='rotate(8deg) translate(30px, 20px)'">
+                <img src="https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=400&q=80" alt="Slow trail vibe" style="width: 100%; height: 220px; object-fit: cover;">
+                <div style="font-family: 'Caveat', cursive; font-size: 1.3rem; text-align: center; margin-top: 12px; color: #333;">Morning Mist, No Rush</div>
+            </div>
+
+            <svg class="marker-scribble" viewBox="0 0 100 100" style="position: absolute; width: 120px; height: 120px; top: 10%; right: 15%; z-index: 3; fill: none; stroke: #e67e22; stroke-width: 2; stroke-linecap: round; transform: rotate(15deg); pointer-events: none;">
+                <path d="M10,50 C10,20 90,20 90,50 C90,80 10,80 15,52 C17,40 45,15 75,30" />
+            </svg>
+            
+            <div style="position: absolute; bottom: 12%; left: 10%; background: #fffde2; padding: 10px 15px; box-shadow: 2px 5px 15px rgba(0,0,0,0.08); font-family: 'Caveat', cursive; font-size: 1.1rem; color: #b83b1d; transform: rotate(-5deg); z-index: 3; border-left: 3px solid #b83b1d;">
+                📌 Handpicked trails only!
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- option 1 end -->
+     <!-- option 2 start -->
+    <section class="hero-split-map" style="position: relative; background: #f4f1ea; min-height: 100vh; display: flex; align-items: center; padding: 100px 0 0 0; overflow: hidden;">
+    <div style="width: 100%; display: flex; flex-wrap: wrap;">
+        
+        <div class="split-left" style="flex: 1; min-width: 320px; padding: 60px 40px; display: flex; flex-direction: column; justify-content: center; background: #f4f1ea; z-index: 2;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <span style="width: 40px; height: 1px; background: #2d3a22;"></span>
+                <span style="font-family: 'Almendra Display', serif; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; color: #2d3a22;">SLOW TRAVEL MOVEMENT</span>
+            </div>
+            
+            <h1 style="font-family: 'Grenze Gotisch', serif; font-size: clamp(3rem, 5vw, 5rem); color: #2d3a22; line-height: 1.0; margin-bottom: 25px;">
+                Travel Slow,<br><span style="color: #8c906c; font-style: italic;">Go Offmap.</span>
+            </h1>
+            
+            <p style="font-family: 'Almendra Display', serif; font-size: 1.2rem; color: #555; max-width: 500px; line-height: 1.6; margin-bottom: 40px;">
+                We explore every single remote path, mountain valley, and local hamlet ourselves before mapping your journey. Real adventure cannot be rushed.
+            </p>
+            
+            <div style="display: flex; gap: 15px;">
+                <a href="#map-section" style="background: #2d3a22; color: #fff; text-decoration: none; padding: 16px 35px; font-family: 'Grenze Gotisch', serif; font-size: 1.25rem; border-radius: 30px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">View Interactive Maps</a>
+            </div>
+        </div>
+
+        <div class="split-right" style="flex: 1; min-width: 450px; min-height: 80vh; position: relative; background: #2d3a22; overflow: hidden;">
+            <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(rgba(45,58,34,0.3), rgba(45,58,34,0.6)), url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;"></div>
+            
+            <svg style="position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.25; stroke: #ebdcb9; fill: none; stroke-width: 1;" viewBox="0 0 500 500" preserveAspectRatio="none">
+                <path d="M 0,100 C 150,120 200,80 350,150 C 450,200 400,350 500,400 M 0,200 C 100,250 300,180 400,300 C 450,350 380,450 500,480" />
+                <path d="M 50,50 C 120,180 80,250 250,300 C 350,320 420,100 480,50" />
+            </svg>
+
+            <div class="map-pulse-pin" style="position: absolute; top: 35%; left: 40%; z-index: 5; cursor: pointer;">
+                <span style="position: absolute; display: inline-flex; border-radius: 50%; height: 24px; width: 24px; background: rgba(230,126,34,0.5); animation: ripple 1.5s infinite; left:-6px; top:-6px;"></span>
+                <div style="width: 12px; height: 12px; background: #e67e22; border-radius: 50%; border: 2px solid #fff;"></div>
+                <div style="position: absolute; left: 20px; top: -5px; background: rgba(255,255,255,0.95); padding: 4px 10px; font-family: 'Almendra Display', serif; font-size: 0.8rem; white-space: nowrap; border-radius: 4px; color:#2d3a22; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">Zanskar Valley</div>
+            </div>
+
+            <div class="map-pulse-pin" style="position: absolute; top: 60%; left: 65%; z-index: 5; cursor: pointer;">
+                <span style="position: absolute; display: inline-flex; border-radius: 50%; height: 24px; width: 24px; background: rgba(230,126,34,0.5); animation: ripple 1.5s infinite; left:-6px; top:-6px; animation-delay: 0.5s;"></span>
+                <div style="width: 12px; height: 12px; background: #e67e22; border-radius: 50%; border: 2px solid #fff;"></div>
+                <div style="position: absolute; left: 20px; top: -5px; background: rgba(255,255,255,0.95); padding: 4px 10px; font-family: 'Almendra Display', serif; font-size: 0.8rem; white-space: nowrap; border-radius: 4px; color:#2d3a22; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">Hidden Mystical Hamlet</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+@keyframes ripple {
+    0% { transform: scale(0.5); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+     <!-- option 2 end -->
+
+<!-- opton 3 start -->
+<section class="hero-cinematic" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+    
+    <div class="parallax-media-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 120%; y-transform: translateY(0); transition: transform 0.1s ease-out; pointer-events: none;">
+        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=90" alt="Cinematic morning mountains" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.75);">
+    </div>
+
+    <div class="parchment-box" style="position: relative; z-index: 5; background: #ebdcb9; max-width: 680px; padding: 50px 60px; margin: 0 20px; text-align: center; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid rgba(45,58,34,0.1);">
+        
+        <div style="font-family: 'Caveat', cursive; font-size: 1.5rem; color: #e67e22; margin-bottom: 12px; font-weight: bold;">
+            🍃 Unexplored trails await your step
+        </div>
+
+        <h1 style="font-family: 'Grenze Gotisch', serif; font-size: clamp(2.5rem, 4.5vw, 4.2rem); color: #2d3a22; line-height: 1.0; margin-bottom: 20px;">
+            Travel Slow, Go OffMap
+        </h1>
+
+        <div style="width: 60px; height: 2px; background: #8c906c; margin: 15px auto 25px;"></div>
+
+        <p style="font-family: 'Almendra Display', serif; font-size: 1.15rem; color: #4a3e2c; line-height: 1.6; margin-bottom: 35px;">
+            We do travel differently. We skip standard tourist checkboxes entirely to spend deep, quality time connecting directly with local souls, hidden hamlets, and slow ridge paths.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <a href="#journeys" style="background: #2d3a22; color: #ebdcb9; text-decoration: none; font-family: 'Grenze Gotisch', serif; font-size: 1.2rem; padding: 14px 35px; border-radius: 4px; transition: 0.3s; box-shadow: 0 4px 15px rgba(45,58,34,0.2);" onmouseover="this.style.background='#425433'" onmouseout="this.style.background='#2d3a22'">Explore Journeys</a>
+            <a href="#about" style="background: transparent; color: #2d3a22; border: 2px solid #2d3a22; text-decoration: none; font-family: 'Grenze Gotisch', serif; font-size: 1.2rem; padding: 12px 33px; border-radius: 4px; transition: 0.3s;" onmouseover="this.style.background='rgba(45,58,34,0.06)'" onmouseout="this.style.background='transparent'">Our Philosophy</a>
+        </div>
+    </div>
+
+    <div style="position: absolute; bottom: -2px; left: 0; width: 100%; overflow: hidden; line-height: 0; transform: rotate(180deg);">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="relative; display: block; width: 100%; height: 45px; fill: #f4f1ea;">
+            <path d="M0,0 Q150,90 300,45 T600,75 T900,30 T1200,60 L1200,0 L0,0 Z"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- option 3 end  -->
+
+    <section class="journeys" id="trajectories">
+        <div class="container">
+            <div class="journeys-header reveal">
+                <span class="section-tag">02 // Open Tracks</span>
+                <h2>Slower Trajectories</h2>
+            </div>
+            
+            <div class="streamflow-grid">
+                <div class="stream-card card-left reveal">
+                    <div class="stream-img-wrapper">
+                        <span class="tag-badge">9 Days Drift</span>
+                        <img src="https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=900&q=80" alt="Highlands farming valley">
+                    </div>
+                    <div class="stream-info-banner">
+                        <h3>Isolated Outposts of Higher Valleys</h3>
+                        <p>Ditch standard observation viewing decks. Settle into an isolated high-altitude stone farming homestead for five consecutive nights.</p>
+                    </div>
+                </div>
+
+                <div class="stream-card card-right reveal">
+                    <div class="stream-img-wrapper">
+                        <span class="tag-badge">12 Days Drift</span>
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80" alt="Empty desert range dunes">
+                    </div>
+                    <div class="stream-info-banner">
+                        <h3>Muted Sands & Empty Topography</h3>
+                        <p>Immerse yourself in vast, silent desert vistas. Sleep under unfiltered star systems away from modern infrastructure grids.</p>
+                    </div>
+                </div>
+
+                <div class="stream-card card-full reveal">
+                    <div class="stream-img-wrapper" style="height: 440px;">
+                        <span class="tag-badge">8 Days Drift</span>
+                        <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1400&q=80" alt="Deep sylvan woodland pathway">
+                    </div>
+                    <div class="stream-info-banner" style="width: 75%; bottom: -40px;">
+                        <h3>Sylvan Canopies & Forgotten Footholds</h3>
+                        <p>Trace ancient timber trails alongside localized botanical historians. Discover old-growth forest micro-dynamics safely.</p>
+                    </div>
+                    <div class="handdrawn-circle-overlay">
+                        <span class="scribble-text" style="color: var(--accent-orange); font-size: 1.6rem; text-shadow: 2px 2px var(--white);">* Best Seller</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pathfinder" id="explorer">
+        <div class="torn-divider-top"></div>
+        <div class="container">
+            <span class="section-tag" style="text-align: center; color: var(--muted-gold);">03 // Interactive Laboratory</span>
+            <h2>The Topology Selector</h2>
+            <p class="pathfinder-subtitle">Click across the topographic coordinate anchors to simulate alternative slow movement paths.</p>
+            
+            <div class="map-interactive-wrapper">
+                <div class="map-vector-frame">
+                    <svg class="map-svg-canvas">
+                        <path d="M 90 100 Q 220 320 200 270 T 400 140 T 500 320" fill="none" stroke="rgba(210,166,101,0.3)" stroke-width="3" stroke-dasharray="10,8" />
+                    </svg>
+                    
+                    <div class="map-node node-1 active" data-index="panel-1">I</div>
+                    <div class="map-node node-2" data-index="panel-2">II</div>
+                    <div class="map-node node-3" data-index="panel-3">III</div>
+                    <div class="map-node node-4" data-index="panel-4">IV</div>
+                </div>
+
+                <div class="pathfinder-display-panel">
+                    <div class="panel-content panel-1 active">
+                        <h4>I // Morning Thresholds</h4>
+                        <p>Instead of waking up at 5:00 AM to catch airport tour shuttles, watch fog burn off high pasture basins over local hand-roasted willow teas.</p>
+                    </div>
+                    <div class="panel-content panel-2">
+                        <h4>II // Foraging Routes</h4>
+                        <p>Spend complete afternoons cataloging native edible fauna alongside village elders rather than peering down through glass tour buses.</p>
+                    </div>
+                    <div class="panel-content panel-3">
+                        <h4>III // Uncharted Tracks</h4>
+                        <p>Step completely away from pre-paved concrete viewpoints. Walk along historic migratory pathways shaped purely by natural geography.</p>
+                    </div>
+                    <div class="panel-content panel-4">
+                        <h4>IV // Night Horizon Stills</h4>
+                        <p>Settle into local valley homestead structures where your evening schedule matches the slow natural patterns of the terrain.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23E6DFD3'/%3E%3C/svg%3E&quot;); transform: none;"></div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <span class="section-tag" style="text-align: center;">04 // Wanderer Records</span>
+            <h2>Voices From The Trail</h2>
+            
+            <div class="staggered-track">
+                <div class="track-column">
+                    <div class="journal-card reveal">
+                        <p>"I completely lost track of tracking metrics by day three. Sitting on pasture rocks with elders redefined my outlook."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Elena R.">
+                            <div>
+                                <h5>Elena R. // Architectural Planner</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="journal-card reveal">
+                        <p>"OffMap doesn't shuffle you between tourist gift counters. They introduce you directly into deep, quiet ecosystems."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Marcus K.">
+                            <div>
+                                <h5>Marcus K. // Landscape Designer</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="track-column">
+                    <div class="journal-card reveal" style="transition-delay: 0.1s;">
+                        <p>"The lack of timeline grids altered everything. When heavy rainfall trapped us inside a tiny mountain kitchen, it became the highlight of our season."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" alt="Devendra S.">
+                            <div>
+                                <h5>Devendra S. // Studio Director</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="journal-card reveal" style="transition-delay: 0.1s;">
+                        <p>"Slowing down allowed us to genuinely see the landscape textures rather than merely checking destinations off a list."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80" alt="Clara M.">
+                            <div>
+                                <h5>Clara M. // Anthropologist</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="plotter">
+        <div class="torn-divider-top" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23242926'%3E%3C/path%3E%3C/svg%3E\");"></div>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-cta reveal">
+                    <h2>Ready to wander slower?</h2>
+                    <p>Leave your fast-paced grid behind. Select your desired landscape topography concept, and let's coordinate an open drift route plan safely.</p>
+                    <span class="scribble-text" style="color: var(--muted-gold);">* Routes follow custom seasonal shifts</span>
+                </div>
+                
+                <div class="footer-form-wrapper reveal" style="transition-delay: 0.2s;">
+                    <form class="interactive-form" onsubmit="event.preventDefault(); alert('Coordinates cataloged. A trail planner will reach out via slow signals.');">
+                        <div class="form-row">
+                            <input type="text" id="username" placeholder=" " required>
+                            <label for="username">Your Identity Name</label>
+                        </div>
+                        <div class="form-row">
+                            <input type="email" id="useremail" placeholder=" " required>
+                            <label for="useremail">Email Coordinates</label>
+                        </div>
+                        <div class="form-row">
+                            <select id="userterrain" required style="color: var(--warm-cream); background: transparent;">
+                                <option value="" disabled selected hidden></option>
+                                <option value="alpine" style="background: var(--charcoal);">High Altitude Pasture Basins</option>
+                                <option value="sylvan" style="background: var(--charcoal);">Old Growth Sylvan Woodlands</option>
+                                <option value="arid" style="background: var(--charcoal);">Silent Sand-Topography Dunes</option>
+                            </select>
+                            <label for="userterrain" style="top: -1rem; font-size: 0.85rem; color: var(--muted-gold);">Desired Topography</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--sand-beige); color: var(--charcoal); box-shadow: 0 4px 0 rgba(253,251,247,0.2);">Initiate Drift</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 offmap.in. Curated with absolute intent.</p>
+                <ul class="socials">
+                    <li><a href="#">Journal Logs</a></li>
+                    <li><a href="https://www.instagram.com/bitsofeverywhere_">Instagram Moodboard</a></li>
+                    <li><a href="#">Footprint Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. BAR SCROLL RUNNER CLASS TRIGGER
+            const navbar = document.querySelector(".navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // 2. PARALLAX TRANSLATION TRACKER FOR IMAGE BACKGROUNDS
+            const heroBackground = document.getElementById("hero-parallax-target");
+            window.addEventListener("scroll", () => {
+                const scrolledOffset = window.pageYOffset;
+                heroBackground.style.transform = `translateY(${scrolledOffset * 0.35}px) translateZ(0)`;
+            });
+
+            // 3. INTERACTIVE TOPOGRAPHY NAVIGATION NODE CHANGER
+            const mapNodes = document.querySelectorAll(".map-node");
+            const dataPanels = document.querySelectorAll(".panel-content");
+
+            mapNodes.forEach(node => {
+                node.addEventListener("click", () => {
+                    mapNodes.forEach(n => n.classList.remove("active"));
+                    dataPanels.forEach(p => p.classList.remove("active"));
+
+                    node.classList.add("active");
+                    const targetedPanelIndex = node.getAttribute("data-index");
+                    document.querySelector(`.${targetedPanelIndex}`).classList.add("active");
+                });
+            });
+
+            // 4. ANIMATION REVEAL INTERSECTION OBSERVER
+            const scrollElements = document.querySelectorAll(".reveal");
+            const targetObserverConfig = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -40px 0px"
+            };
+
+            const scrollRevealIntersectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, targetObserverConfig);
+
+            scrollElements.forEach(elem => scrollRevealIntersectionObserver.observe(elem));
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap | Travel Slow, Go Offmap!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* -----------------------------------------------------------
+           1. EXACT BRAND COLOR MATRIX & CORE SETTINGS
+        -------------------------------------------------------------- */
+        :root {
+            --black-olive: #3F423F;
+            --lapis-lazuli: #476586;
+            --moss-green: #8C8C42;
+            --reseda-green: #607070;
+            --yellow-green: #99C652;
+            --sand-beige: #F4EFE6;
+            --off-white: #FAF8F5;
+            
+            --font-display: 'Almendra Display', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-scribble: 'Caveat', cursive;
+            
+            --transition: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* -----------------------------------------------------------
+           2. GLOBAL SCRAPBOOK RESET & UTILITIES
+        -------------------------------------------------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--sand-beige);
+            color: var(--black-olive);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: var(--font-display);
+            font-weight: normal;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Handwritten Marker Overlays */
+        .marker-scribble {
+            font-family: var(--font-scribble);
+            color: var(--yellow-green);
+            font-size: 2rem;
+            display: inline-block;
+            transform: rotate(-4deg);
+            position: relative;
+        }
+
+        .marker-scribble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -10px;
+            width: 110%;
+            height: 6px;
+            background: rgba(153, 198, 82, 0.3);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Raw Torn-Paper Cut Edge Breaks */
+        .paper-tear {
+            width: 100%;
+            height: 40px;
+            background-color: var(--sand-beige);
+            position: relative;
+            z-index: 10;
+            clip-path: polygon(0% 0%, 4% 60%, 9% 20%, 13% 70%, 18% 30%, 22% 80%, 27% 15%, 32% 65%, 36% 25%, 41% 85%, 45% 30%, 50% 60%, 54% 15%, 59% 75%, 63% 35%, 68% 90%, 72% 20%, 77% 65%, 81% 10%, 86% 80%, 91% 25%, 95% 70%, 100% 0%, 100% 100%, 0% 100%);
+            margin-top: -39px;
+        }
+
+        .paper-tear.invert {
+            transform: scaleY(-1);
+            margin-top: 0;
+            margin-bottom: -1px;
+            background-color: var(--black-olive);
+        }
+
+        .paper-tear.sand-to-olive {
+            background-color: var(--black-olive);
+            clip-path: polygon(0% 0%, 3% 40%, 7% 10%, 12% 50%, 16% 20%, 20% 60%, 25% 15%, 30% 45%, 35% 10%, 39% 55%, 44% 20%, 49% 40%, 53% 10%, 58% 50%, 62% 25%, 67% 60%, 71% 15%, 76% 45%, 80% 5%, 85% 55%, 89% 20%, 94% 50%, 100% 0%, 100% 100%, 0% 100%);
+            margin-top: -39px;
+        }
+
+        /* Custom Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--black-olive);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--moss-green);
+            border-radius: 20px;
+        }
+
+        /* -----------------------------------------------------------
+           3. FLOATING NAV DESIGN
+        -------------------------------------------------------------- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 1.8rem 0;
+            transition: all 0.4s var(--transition);
+        }
+
+        header.scrolled {
+            background: rgba(63, 66, 63, 0.92);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+        }
+
+        header.scrolled .logo-text, header.scrolled .nav-links a {
+            color: var(--sand-beige);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        /* Cloud Brand Silhouette */
+        .cloud-badge {
+            width: 52px;
+            height: 52px;
+            background: var(--lapis-lazuli);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--yellow-green);
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .cloud-badge::before {
+            content: 'off';
+            font-family: var(--font-body);
+            font-weight: 700;
+            color: var(--sand-beige);
+            font-size: 1rem;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--black-olive);
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--black-olive);
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--yellow-green);
+            transition: width 0.3s var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* -----------------------------------------------------------
+           4. ASYMMETRICAL ALBUM HERO BLOCK (NO DULL WHITE BACKGROUNDS)
+        -------------------------------------------------------------- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 140px;
+            padding-bottom: 80px;
+            background: radial-gradient(circle at 80% 20%, rgba(71, 101, 134, 0.15), transparent), var(--sand-beige);
+            position: relative;
+        }
+
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-left h1 {
+            font-size: clamp(3.8rem, 6.5vw, 6rem);
+            line-height: 0.95;
+            color: var(--black-olive);
+            margin-bottom: 2rem;
+        }
+
+        .hero-left h1 span {
+            display: block;
+            color: var(--lapis-lazuli);
+            font-style: italic;
+        }
+
+        .hero-subtext {
+            font-size: 1.2rem;
+            color: var(--reseda-green);
+            margin-bottom: 3rem;
+            max-width: 580px;
+            font-weight: 400;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        /* Gen-Z Fluid CTA Pill Buttons */
+        .cta-pill {
+            padding: 1.2rem 2.5rem;
+            border-radius: 40px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            transition: all 0.4s var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-pill-dark {
+            background-color: var(--black-olive);
+            color: var(--sand-beige);
+            box-shadow: 0 10px 25px rgba(63, 66, 63, 0.2);
+        }
+
+        .cta-pill-dark:hover {
+            background-color: var(--yellow-green);
+            color: var(--black-olive);
+            transform: translateY(-4px) rotate(-1deg);
+            box-shadow: 0 15px 30px rgba(153, 198, 82, 0.3);
+        }
+
+        .cta-pill-outline {
+            border: 2px solid var(--reseda-green);
+            color: var(--black-olive);
+        }
+
+        .cta-pill-outline:hover {
+            background-color: var(--reseda-green);
+            color: var(--sand-beige);
+            transform: translateY(-4px) rotate(1deg);
+        }
+
+        /* Right Hand Polaroid Fan Pile Layout */
+        .hero-right-pile {
+            position: relative;
+            height: 550px;
+            width: 100%;
+        }
+
+        .scrapbook-photo {
+            position: absolute;
+            background: white;
+            padding: 1rem 1rem 4rem 1rem;
+            box-shadow: 0 15px 35px rgba(63, 66, 63, 0.12);
+            border-radius: 2px;
+            transition: all 0.4s var(--transition);
+            cursor: pointer;
+        }
+
+        .scrapbook-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-1 {
+            width: 75%;
+            height: 75%;
+            top: 5%;
+            left: 5%;
+            transform: rotate(-4deg);
+            z-index: 3;
+        }
+
+        .photo-2 {
+            width: 70%;
+            height: 70%;
+            bottom: 5%;
+            right: 0;
+            transform: rotate(5deg);
+            z-index: 2;
+        }
+
+        .hero-right-pile:hover .photo-1 {
+            transform: rotate(-1deg) translate(-10px, -10px);
+            z-index: 4;
+        }
+
+        .hero-right-pile:hover .photo-2 {
+            transform: rotate(1deg) translate(10px, 10px);
+        }
+
+        /* -----------------------------------------------------------
+           5. PHILOSOPHY SECTION (DEEP MATTE BLOCK SHIFT)
+        -------------------------------------------------------------- */
+        .philosophy-section {
+            background-color: var(--black-olive);
+            color: var(--sand-beige);
+            padding: 10rem 0;
+            position: relative;
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        .philosophy-left h2 {
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            color: var(--sand-beige);
+        }
+
+        .philosophy-left h2 em {
+            color: var(--yellow-green);
+            font-style: normal;
+        }
+
+        .flow-callout {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            line-height: 1.2;
+            color: var(--moss-green);
+            border-top: 1px dashed rgba(244, 239, 230, 0.2);
+            padding-top: 2rem;
+            margin-top: 3rem;
+        }
+
+        .philosophy-right-text {
+            font-size: 1.25rem;
+            font-weight: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            color: rgba(244, 239, 230, 0.85);
+        }
+
+        .philosophy-right-text strong {
+            color: var(--yellow-green);
+            font-weight: 600;
+        }
+
+        /* -----------------------------------------------------------
+           6. MAP THE ROUTE (INTERACTIVE PROGRESSIVE TIMELINE STRIP)
+        -------------------------------------------------------------- */
+        .map-section {
+            padding: 10rem 0;
+            background-color: var(--sand-beige);
+            position: relative;
+        }
+
+        .center-heading {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 6rem auto;
+        }
+
+        .center-heading h2 {
+            font-size: 3.8rem;
+            margin-bottom: 1rem;
+            color: var(--black-olive);
+        }
+
+        .interactive-strip {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+        }
+
+        /* Simulated drawn map line path overlay */
+        .interactive-strip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: repeating-linear-gradient(to bottom, transparent, transparent 10px, var(--lapis-lazuli) 10px, var(--lapis-lazuli) 20px);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .strip-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .strip-card:nth-child(even) .card-desc-box {
+            grid-column: 2;
+        }
+
+        .strip-card:nth-child(even) .card-media-box {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .checkpoint-pin {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 32px;
+            height: 32px;
+            background-color: var(--yellow-green);
+            border: 6px solid var(--sand-beige);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            box-shadow: 0 0 0 8px rgba(153, 198, 82, 0.25);
+            transition: all 0.3s;
+        }
+
+        .strip-card:hover .checkpoint-pin {
+            background-color: var(--lapis-lazuli);
+            scale: 1.2;
+        }
+
+        .card-desc-box {
+            background: var(--off-white);
+            padding: 3.5rem;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(63, 66, 63, 0.05);
+            border: 1px solid rgba(63, 66, 63, 0.04);
+            position: relative;
+        }
+
+        .index-stamp {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            color: rgba(71, 101, 134, 0.12);
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            line-height: 1;
+        }
+
+        .card-desc-box h3 {
+            font-size: 2.2rem;
+            color: var(--black-olive);
+            margin-bottom: 1.2rem;
+        }
+
+        .card-desc-box p {
+            color: var(--reseda-green);
+            font-size: 1.1rem;
+        }
+
+        .card-media-box {
+            height: 340px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 45px rgba(63, 66, 63, 0.1);
+            transform: rotate(-1.5deg);
+            transition: transform 0.4s var(--transition);
+        }
+
+        .strip-card:nth-child(even) .card-media-box {
+            transform: rotate(1.5deg);
+        }
+
+        .strip-card:hover .card-media-box {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .card-media-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* -----------------------------------------------------------
+           7. SLOW DEPARTURES MAP BLOCK (GRID)
+        -------------------------------------------------------------- */
+        .departures-section {
+            padding: 10rem 0;
+            background-color: var(--off-white);
+        }
+
+        .departures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .departure-card {
+            background: var(--sand-beige);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+            transition: all 0.4s var(--transition);
+        }
+
+        .departure-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px rgba(63, 66, 63, 0.08);
+        }
+
+        .media-frame {
+            position: relative;
+            height: 360px;
+            overflow: hidden;
+        }
+
+        .media-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--transition);
+        }
+
+        .departure-card:hover .media-frame img {
+            transform: scale(1.06);
+        }
+
+        .vibe-tag {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: var(--black-olive);
+            color: var(--sand-beige);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .duration-badge {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--lapis-lazuli);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .info-pane {
+            padding: 2.5rem;
+        }
+
+        .info-pane h3 {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--black-olive);
+        }
+
+        .info-pane p {
+            color: var(--reseda-green);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .pane-meta-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed rgba(63, 66, 63, 0.15);
+            padding-top: 1.5rem;
+        }
+
+        .cost-stamp {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--black-olive);
+        }
+
+        .action-arrow {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--moss-green);
+        }
+
+        /* -----------------------------------------------------------
+           8. GROUNDED EARTH INTERACTIVE FOOTER & LEAD ENGINE
+        -------------------------------------------------------------- */
+        footer {
+            background-color: var(--black-olive);
+            color: var(--sand-beige);
+            padding: 10rem 0 3rem 0;
+            position: relative;
+        }
+
+        .footer-split {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 7rem;
+            align-items: flex-start;
+            margin-bottom: 6rem;
+        }
+
+        .footer-pitch h2 {
+            font-size: 3.8rem;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            color: var(--sand-beige);
+        }
+
+        .footer-pitch p {
+            color: rgba(244, 239, 230, 0.7);
+            font-size: 1.15rem;
+            max-width: 440px;
+            margin-bottom: 3rem;
+        }
+
+        /* Intimate Journal Style Booking Blueprint */
+        .blueprint-card {
+            background: rgba(244, 239, 230, 0.05);
+            border: 1px dashed rgba(244, 239, 230, 0.15);
+            padding: 3.5rem;
+            border-radius: 28px;
+        }
+
+        .blueprint-card h3 {
+            font-size: 2.4rem;
+            margin-bottom: 2rem;
+            color: var(--sand-beige);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .input-block.wide {
+            grid-column: span 2;
+        }
+
+        .input-block label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--yellow-green);
+            font-weight: 700;
+        }
+
+        .input-block input, .input-block select {
+            background: rgba(244, 239, 230, 0.06);
+            border: 1px solid rgba(244, 239, 230, 0.12);
+            padding: 1.1rem 1.4rem;
+            border-radius: 12px;
+            color: var(--sand-beige);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .input-block input:focus, .input-block select:focus {
+            outline: none;
+            border-color: var(--yellow-green);
+            background: rgba(244, 239, 230, 0.1);
+        }
+
+        .input-block select option {
+            background: var(--black-olive);
+            color: white;
+        }
+
+        .pill-submit-btn {
+            width: 100%;
+            background-color: var(--yellow-green);
+            color: var(--black-olive);
+            border: none;
+            padding: 1.3rem;
+            border-radius: 40px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .pill-submit-btn:hover {
+            background-color: var(--sand-beige);
+            transform: translateY(-3px);
+        }
+
+        .base-strip {
+            border-top: 1px solid rgba(244, 239, 230, 0.08);
+            padding-top: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: rgba(244, 239, 230, 0.5);
+        }
+
+        .social-row {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .social-row a {
+            transition: color 0.3s;
+        }
+
+        .social-row a:hover {
+            color: var(--yellow-green);
+        }
+
+        /* -----------------------------------------------------------
+           9. MOBILE COMPRESSION METRICS
+        -------------------------------------------------------------- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-layout, .philosophy-grid, .footer-split {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+            .hero-right-pile {
+                height: 450px;
+            }
+            .interactive-strip::before {
+                left: 25px;
+            }
+            .strip-card {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .strip-card:nth-child(even) .card-desc-box,
+            .strip-card:nth-child(even) .card-media-box {
+                grid-column: 1;
+            }
+            .checkpoint-pin {
+                left: 25px;
+            }
+            .card-desc-box, .card-media-box {
+                margin-left: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            .input-block.wide {
+                grid-column: span 1;
+            }
+            .center-heading h2 {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="app-nav">
+        <div class="container nav-container">
+            <a href="#" class="logo-area">
+                <div class="cloud-badge"></div>
+                <span class="logo-text">offmap.in</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#philosophy">The Flow</a>
+                <a href="#route">Methodology</a>
+                <a href="#departures">Departures</a>
+                <a href="#plan">Plan Slot</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-layout">
+            <div class="hero-left">
+                <h1>Travel slow, <span>go Offmap!</span></h1>
+                <p class="hero-subtext">
+                    OffMap is for people who want to travel slower. To hike without rushing, sit with a view longer, and experience places deeply. We explore every location ourselves before taking you there.
+                </p>
+                <div class="hero-actions">
+                    <a href="#departures" class="cta-pill cta-pill-dark">Explore Destinations</a>
+                    <a href="#plan" class="cta-pill cta-pill-outline">Plan Your Trip</a>
+                </div>
+            </div>
+            <div class="hero-right-pile">
+                <div class="scrapbook-photo photo-1">
+                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80" alt="Mountain Pass Trails">
+                </div>
+                <div class="scrapbook-photo photo-2">
+                    <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80" alt="Serene wilderness mountain sitting point">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="paper-tear invert"></div>
+
+    <section id="philosophy" class="philosophy-section">
+        <div class="container philosophy-grid">
+            <div class="philosophy-left">
+                <h2>We don’t make trips around <em>sightseeing.</em></h2>
+                <div class="flow-callout">No Itineraries. Just Flow & Slow Travel.</div>
+            </div>
+            <div class="philosophy-right-text">
+                <p>We curate journeys around <strong>experiencing the true character</strong> of the locations you visit. Travel shouldn't feel like a checklist or a race against time. That's why we do things differently.</p>
+                <p>We spend more time in fewer places, intentionally connect with local communities, and live out raw experiences ourselves long before designing your trip.</p>
+                <div>
+                    <span class="marker-scribble">Unrushed & Rooted</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="paper-tear sand-to-olive"></div>
+
+    <section id="route" class="map-section">
+        <div class="container">
+            <div class="center-heading">
+                <h2>Mapping The Unseen</h2>
+                <p>An inside look into how we research, establish, and pass along untouched, culturally preserved Indian gems.</p>
+            </div>
+
+            <div class="interactive-strip">
+                <div class="strip-card">
+                    <div class="checkpoint-pin"></div>
+                    <div class="card-desc-box">
+                        <span class="index-stamp">01</span>
+                        <h3>Explore Remote Valleys</h3>
+                        <p>We pack bags and head into secluded valleys and off-grid mountain hamlets on our own to manually evaluate pathways, safety matrices, and natural view-points.</p>
+                    </div>
+                    <div class="card-media-box">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=80" alt="Exploring deep wilderness mountain valleys">
+                    </div>
+                </div>
+
+                <div class="strip-card">
+                    <div class="checkpoint-pin"></div>
+                    <div class="card-desc-box">
+                        <span class="index-stamp">02</span>
+                        <h3>Connect with Locals</h3>
+                        <p>We foster close relations with localized heritage hosts, village groups, and native craftsmen to secure safe homestays and authentic communal kitchens.</p>
+                    </div>
+                    <div class="card-media-box">
+                        <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80" alt="Authentic immersion and community alignment">
+                    </div>
+                </div>
+
+                <div class="strip-card">
+                    <div class="checkpoint-pin"></div>
+                    <div class="card-desc-box">
+                        <span class="index-stamp">03</span>
+                        <h3>Curate 3-4 Days Flows</h3>
+                        <p>We design a highly responsive, all-inclusive slow travel loop. Our model boosts localized rural economies, preserves delicate regional subcultures, and avoids standard tourist traps.</p>
+                    </div>
+                    <div class="card-media-box">
+                        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=700&q=80" alt="Deep forest camp footprint layout">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="departures" class="departures-section">
+        <div class="container">
+            <div class="center-heading">
+                <h2>Upcoming Slow Departures</h2>
+                <p>Limited seats. Unrushed paces. Tailored meticulously for conscious travelers joining from PAN India.</p>
+            </div>
+
+            <div class="departures-grid">
+                <div class="departure-card">
+                    <div class="media-frame">
+                        <span class="vibe-tag">High Wilderness</span>
+                        <img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=700&q=80" alt="High cold desert pass trail">
+                        <span class="duration-4">4 Days</span>
+                    </div>
+                    <div class="info-pane">
+                        <h3>Zanskar Silence</h3>
+                        <p>Inhabit legacy stone cottages, trace pristine glacial creeks, and experience night-sky observation hours alongside high-altitude shepherds.</p>
+                        <div class="pane-meta-strip">
+                            <span class="cost-stamp">₹18,500</span>
+                            <a href="#plan" class="action-arrow">Request Access &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="departure-card">
+                    <div class="media-frame">
+                        <span class="vibe-tag">Rainforest Cloud</span>
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80" alt="Lush green tropical forest valley river roots">
+                        <span class="duration-4">3 Days</span>
+                    </div>
+                    <div class="info-pane">
+                        <h3>Khasi Root Channels</h3>
+                        <p>Walk ancestral living root bridges, learn wild-herbage foraging techniques from local gatherers, and spend afternoons near hidden waterfalls.</p>
+                        <div class="pane-meta-strip">
+                            <span class="cost-stamp">₹14,200</span>
+                            <a href="#plan" class="action-arrow">Request Access &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="plan">
+        <div class="container footer-split">
+            <div class="footer-pitch">
+                <h2>Ready to step Offmap?</h2>
+                <p>Leave behind rigid schedules and commercial itineraries. Tap directly into original trails across remote Indian ecosystems.</p>
+                <div>
+                    <span class="marker-scribble" style="color: var(--yellow-green);">Next roster opens soon.</span>
+                </div>
+            </div>
+
+            <div class="blueprint-card">
+                <h3>Micro-Journey Request</h3>
+                <form onsubmit="event.preventDefault(); alert('Slow itinerary preference received! Our scouts will connect over email.');">
+                    <div class="input-row">
+                        <div class="input-block">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" placeholder="e.g., Naina Talwar" required>
+                        </div>
+                        <div class="input-block">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="naina@slowflow.in" required>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-block">
+                            <label for="terrain">Vibe Base</label>
+                            <select id="terrain">
+                                <option value="desert">Cold Desert & Star Gazing</option>
+                                <option value="rainforest">Misty Rainforest Trails</option>
+                            </select>
+                        </div>
+                        <div class="input-block">
+                            <label for="pace">Trek Rhythm</label>
+                            <select id="pace">
+                                <option value="slow">Slow (Max viewing hours)</option>
+                                <option value="moderate">Moderate Discovery Flow</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-block wide">
+                        <button type="submit" class="pill-submit-btn">Register Choice Slot</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="container base-strip">
+            <div>&copy; 2026 offmap.in — Curating meaningful connections with remote communities and natural ecosystems.</div>
+            <div class="social-row">
+                <a href="#">Instagram Journal</a>
+                <a href="#">The Scout Blog</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const nav = document.getElementById('app-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 40) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

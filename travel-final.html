@@ -1,0 +1,647 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap — Travel slow, go Offmap!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Grenze+Gotisch:wght@300;400;600;700&family=Jost:wght@300;400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---------------------------------------------------------------- */
+        /* BRAND DESIGN SYSTEM & DESIGN TOKENS                              */
+        /* ---------------------------------------------------------------- */
+        :root {
+            --forest-dark: #1C2B1F;     /* Rich, premium base tone */
+            --forest-green: #2B3E2D;    /* Mid signature forest green */
+            --sand-beige: #EBE5D8;      /* Organic warm background tone */
+            --warm-cream: #FDFBF7;      /* Clean crisp canvas white */
+            --sunset-gold: #D4A359;     /* Deep sunset yellow accent */
+            --terracotta: #E06A3B;      /* Hand-drawn marker accent */
+            
+            --font-display: 'Grenze Gotisch', serif;
+            --font-accent: 'Almendra Display', serif;
+            --font-body: 'Jost', sans-serif;
+            --font-scribble: 'Caveat', cursive;
+            
+            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--warm-cream);
+            color: var(--forest-dark);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.05;
+            color: var(--forest-green);
+        }
+
+        p {
+            font-size: 1.05rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: rgba(28, 43, 31, 0.8);
+        }
+
+        .section-tag {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--terracotta);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .scribble {
+            font-family: var(--font-scribble);
+            color: var(--terracotta);
+            font-size: 2rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 4rem;
+        }
+
+        @media (max-width: 992px) { .container { padding: 0 2rem; } }
+
+        /* Custom Interactive Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.1rem 2.6rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            border-radius: 4px;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            box-shadow: 0 4px 0 var(--forest-dark);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 0 var(--forest-dark);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--forest-green);
+            border: 2px dashed var(--forest-green);
+        }
+        .btn-secondary:hover {
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            border-style: solid;
+            transform: translateY(-3px);
+        }
+
+        /* Torn Edge Paper Effect SVG Backgrounds */
+        .torn-divider {
+            width: 100%;
+            height: 40px;
+            background-size: 100% 40px;
+            background-repeat: no-repeat;
+            position: relative;
+            z-index: 10;
+        }
+        .torn-to-sand {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,40 C1050,15 900,65 750,30 C600,5 450,55 300,25 C150,5 75,35 0,15 Z' fill='%23EBE5D8'/%3E%3C/svg%3E");
+        }
+        .torn-to-cream {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,40 C1050,15 900,65 750,30 C600,5 450,55 300,25 C150,5 75,35 0,15 Z' fill='%23FDFBF7'/%3E%3C/svg%3E");
+        }
+
+        /* Scroll Animation States */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* STICKY HEADER & BRANDING INITIALIZATION                          */
+        /* ---------------------------------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; z-index: 1000;
+            padding: 2rem 0;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled {
+            padding: 1rem 0;
+            background-color: rgba(253, 251, 247, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px dashed rgba(28, 43, 31, 0.15);
+        }
+        
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo-box { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+        .logo-img {
+            width: 54px; height: 54px; border-radius: 50%;
+            border: 2px solid var(--warm-cream); transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .logo-img { border-color: var(--forest-green); width: 46px; height: 46px; }
+        .logo-text {
+            font-family: var(--font-accent); font-size: 2.1rem; font-weight: 700;
+            color: var(--warm-cream); transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .logo-text { color: var(--forest-green); font-size: 1.8rem; }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--warm-cream); text-decoration: none; transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .nav-links a { color: var(--forest-dark); }
+        .nav-links a:hover { color: var(--sunset-gold) !important; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } }
+
+        /* ---------------------------------------------------------------- */
+        /* NEW HERO SECTION: ASYMMETRIC YJHD SUNSET VISUAL SPLIT            */
+        /* ---------------------------------------------------------------- */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            background-color: var(--forest-dark);
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            align-items: center;
+            padding-top: 80px;
+            overflow: hidden;
+        }
+        
+        .hero-left-panel {
+            padding: 4rem 4rem 6rem 6rem;
+            z-index: 5;
+            position: relative;
+        }
+        .hero-left-panel h1 {
+            font-size: clamp(3.5rem, 6vw, 5.8rem);
+            color: var(--warm-cream);
+            margin-bottom: 1.5rem;
+            line-height: 1.0;
+        }
+        .hero-left-panel p {
+            color: rgba(253, 251, 247, 0.85);
+            font-size: 1.2rem;
+            max-width: 540px;
+            margin-bottom: 3rem;
+        }
+        .hero-button-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+        .hero-right-media {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-right: 4rem;
+        }
+        /* Aesthetic organic video frame cut */
+        .video-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            border-radius: 40% 60% 70% 30% / 50% 60% 40% 50%;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+            border: 2px solid rgba(253, 251, 247, 0.15);
+            animation: organicMorph 12s ease-in-out infinite alternate;
+        }
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85) contrast(1.05);
+        }
+        .video-warm-tint {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(212,163,89,0.15), rgba(28,43,31,0.4));
+            pointer-events: none;
+        }
+
+        @keyframes organicMorph {
+            0% { border-radius: 40% 60% 70% 30% / 50% 60% 40% 50%; }
+            100% { border-radius: 60% 40% 50% 50% / 40% 50% 60% 50%; }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section { grid-template-columns: 1fr; text-align: center; padding-bottom: 4rem; }
+            .hero-left-panel { padding: 6rem 2rem 2rem 2rem; }
+            .hero-left-panel p { margin: 0 auto 3rem; }
+            .hero-button-row { justify-content: center; }
+            .hero-right-media { padding: 0 2rem; min-height: 50vh; }
+            .video-canvas-container { height: 50vh; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* MANIFESTO / ABOUT SLOW TRAVEL                                    */
+        /* ---------------------------------------------------------------- */
+        .manifesto-section { padding: 10rem 0; background-color: var(--sand-beige); }
+        .manifesto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+        .manifesto-content h2 { font-size: clamp(2.8rem, 5vw, 4rem); margin-bottom: 2rem; }
+        
+        .scrapbook-stack { position: relative; width: 100%; height: 450px; }
+        .polaroid-frame {
+            position: absolute; background: var(--white); padding: 14px 14px 40px 14px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08); transition: var(--transition-bounce); cursor: grab;
+        }
+        .polaroid-frame img { width: 100%; height: 280px; object-fit: cover; }
+        .polaroid-caption { font-family: var(--font-scribble); text-align: center; font-size: 1.5rem; margin-top: 12px; color: var(--forest-green); }
+        
+        .frame-1 { width: 280px; top: 0; left: 10%; transform: rotate(-6deg); z-index: 2; }
+        .frame-2 { width: 300px; top: 60px; right: 10%; transform: rotate(5deg); z-index: 1; }
+        .polaroid-frame:hover { transform: scale(1.06) rotate(0deg) !important; z-index: 5; box-shadow: 0 25px 50px rgba(0,0,0,0.18); }
+
+        @media (max-width: 992px) {
+            .manifesto-grid { grid-template-columns: 1fr; gap: 4rem; }
+            .scrapbook-stack { height: 400px; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* AESTHETIC VISUAL CAPTURES (HORIZONTAL SLIDER TRACK)              */
+        /* ---------------------------------------------------------------- */
+        .visual-section { padding: 10rem 0; background-color: var(--warm-cream); overflow: hidden; }
+        .visual-intro { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+        .visual-intro h2 { font-size: clamp(2.6rem, 5vw, 4.2rem); }
+        
+        /* Smooth Interactive Horizontal Slider Array */
+        .slider-window { width: 100vw; margin-left: calc(-50vw + 50%); overflow-x: auto; padding: 2rem 4rem; scrollbar-width: none; }
+        .slider-window::-webkit-scrollbar { display: none; }
+        .slider-track { display: flex; gap: 3rem; width: max-content; }
+        
+        .visual-card {
+            width: 320px; height: 460px; position: relative; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 15px 35px rgba(28,43,31,0.08); transition: var(--transition-smooth);
+        }
+        .visual-card img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-smooth); }
+        .visual-card-meta {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 2.5rem;
+            background: linear-gradient(to top, rgba(28,43,31,0.9), transparent);
+            color: var(--warm-cream); display: flex; flex-direction: column; justify-content: flex-end;
+            transform: translateY(15px); transition: var(--transition-smooth);
+        }
+        .visual-card-meta h3 { color: var(--warm-cream); font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .visual-card-meta span { font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--sunset-gold); font-weight: 500; }
+        
+        .visual-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 50px rgba(28,43,31,0.2); }
+        .visual-card:hover img { transform: scale(1.08); }
+        .visual-card:hover .visual-card-meta { transform: translateY(0); }
+
+        /* ---------------------------------------------------------------- */
+        /* COMPACT PREMIUM TRAIL CURATORS (PATHKEEPER CARDS)                */
+        /* ---------------------------------------------------------------- */
+        .curators-section { padding: 10rem 0; background-color: var(--sand-beige); }
+        .curators-intro { text-align: center; max-width: 650px; margin: 0 auto 5rem; }
+        .curators-intro h2 { font-size: clamp(2.6rem, 5vw, 4rem); margin-bottom: 1rem; }
+        
+        /* Optimized downscaled layout grid */
+        .curators-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+        .curator-mini-card {
+            background: var(--warm-cream); border-radius: 6px; overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.04); transition: var(--transition-smooth);
+            border-bottom: 4px solid transparent;
+        }
+        .curator-thumb { width: 100%; height: 280px; overflow: hidden; }
+        .curator-thumb img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-smooth); }
+        
+        .curator-body { padding: 2rem; text-align: center; }
+        .curator-body h3 { font-size: 1.8rem; margin-bottom: 0.2rem; }
+        .curator-body span { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--sunset-gold); }
+        .curator-body p { margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+        .curator-mini-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(28,43,31,0.12); border-bottom-color: var(--terracotta); }
+        .curator-mini-card:hover .curator-thumb img { transform: scale(1.06); }
+
+        @media (max-width: 992px) { .curators-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; } }
+
+        /* ---------------------------------------------------------------- */
+        /* COMPREHENSIVE EARTHY INTEGRATED FOOTER PLATFORM                  */
+        /* ---------------------------------------------------------------- */
+        .integrated-footer {
+            background-color: var(--forest-dark);
+            color: var(--warm-cream);
+            padding: 8rem 0 3rem 0;
+            position: relative;
+        }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; margin-bottom: 6rem; }
+        .footer-left h2 { color: var(--warm-cream); font-size: clamp(2.6rem, 5vw, 4.2rem); margin-bottom: 1.5rem; }
+        .footer-left p { color: rgba(253, 251, 247, 0.75); font-size: 1.1rem; margin-bottom: 2.5rem; }
+        
+        .custom-form { display: flex; flex-direction: column; gap: 2.2rem; }
+        .form-group { position: relative; }
+        .custom-form input, .custom-form select {
+            width: 100%; padding: 1.1rem 0; background: transparent; border: none;
+            border-bottom: 1px dashed rgba(253, 251, 247, 0.3); color: var(--warm-cream);
+            font-family: var(--font-body); font-size: 1.05rem; outline: none; transition: 0.4s;
+        }
+        .custom-form input:focus, .custom-form select:focus { border-bottom-color: var(--sunset-gold); border-bottom-style: solid; }
+        .custom-form label { position: absolute; top: 1.1rem; left: 0; color: rgba(253, 251, 247, 0.4); pointer-events: none; transition: 0.3s; }
+        
+        .custom-form input:focus ~ label,
+        .custom-form input:not(:placeholder-shown) ~ label {
+            top: -1rem; font-size: 0.8rem; color: var(--sunset-gold); letter-spacing: 1px;
+        }
+
+        /* Cohesive Shared Sub-Footing Interface */
+        .footer-base {
+            border-top: 1px solid rgba(253, 251, 247, 0.1);
+            padding-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .footer-base p { font-size: 0.9rem; color: rgba(253, 251, 247, 0.4); }
+        .footer-socials { display: flex; gap: 2rem; list-style: none; }
+        .footer-socials a { color: rgba(253, 251, 247, 0.5); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .footer-socials a:hover { color: var(--sunset-gold); }
+
+        @media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr; gap: 5rem; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-flex">
+            <a href="#" class="logo-box">
+                <img src="https://i.ibb.co/v6YgYvV/image-0157e0.png" alt="OffMap Logo" class="logo-img">
+                <span class="logo-text">offmap.in</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#manifesto">Manifesto</a></li>
+                <li><a href="#captures">Captures</a></li>
+                <li><a href="#curators">Curators</a></li>
+                <li><a href="#coordinates">Coordinates</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="hero-left-panel">
+            <span class="section-tag" style="color: var(--sunset-gold);">Slow Travel Movement</span>
+            <h1>Travel slow,<br>go Offmap!</h1>
+            <p style="font-weight: 300;">OffMap is engineered for those looking to skip the checklist entirely. Hike without timeline intervals, sit with mountain panoramas longer, and experience geography deeply.</p>
+            <div class="hero-button-row">
+                <a href="#captures" class="btn btn-primary">Explore Drifts</a>
+                <a href="#coordinates" class="btn btn-secondary" style="color: var(--warm-cream); border-color: var(--warm-cream);">Plot Route</a>
+            </div>
+        </div>
+        <div class="hero-right-media">
+            <div class="video-canvas-container">
+                <video class="hero-video" autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80">
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-beautiful-sunset-over-the-mountains-41710-large.mp4" type="video/mp4">
+                </video>
+                <div class="video-warm-tint"></div>
+            </div>
+        </div>
+        <div class="torn-divider torn-to-sand" style="position: absolute; bottom: 0; left: 0;"></div>
+    </header>
+
+    <section class="manifesto-section" id="manifesto">
+        <div class="container">
+            <div class="manifesto-grid">
+                <div class="manifesto-content reveal">
+                    <span class="section-tag">01 // Intention</span>
+                    <h2>We don't make trips around sightseeing.</h2>
+                    <p style="font-size: 1.3rem; font-family: var(--font-display); color: var(--forest-green); margin-bottom: 1.5rem;">
+                        We curate open drifts. No rigorous itineraries—just pure, unhurried flow.
+                    </p>
+                    <p style="margin-bottom: 2rem;">
+                        Standard schedules rush your senses until beautiful cultures blur. We do it differently by lingering in remote coordinates longer, tracking trail patterns with local communities before welcoming you.
+                    </p>
+                    <span class="scribble">* Handcrafted tracking metrics</span>
+                </div>
+                
+                <div class="scrapbook-stack reveal">
+                    <div class="polaroid-frame frame-1">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80" alt="High Alt Meadows">
+                        <div class="polaroid-caption">Alpine Basins // 02</div>
+                    </div>
+                    <div class="polaroid-frame frame-2">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=80" alt="Mountain Glow Peak">
+                        <div class="polaroid-caption">Summit Horizon Vibe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider torn-to-cream" style="margin-top: 6rem;"></div>
+    </section>
+
+    <section class="visual-section" id="captures">
+        <div class="container">
+            <div class="visual-intro reveal">
+                <div>
+                    <span class="section-tag">02 // Lens Captures</span>
+                    <h2>Visual Outposts</h2>
+                </div>
+                <p style="max-width: 380px; font-size: 0.95rem; margin-bottom: 0.5rem;">Aesthetic glimpses recorded across uncharted ridge lines, timber valleys, and open meadows.</p>
+            </div>
+        </div>
+
+        <div class="slider-window reveal">
+            <div class="slider-track">
+                <div class="visual-card">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=500&q=80" alt="High Peaks">
+                    <div class="visual-card-meta">
+                        <h3>Zanskar Ridges</h3>
+                        <span>Coordinates 33.4° N</span>
+                    </div>
+                </div>
+                <div class="visual-card">
+                    <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=500&q=80" alt="Woods Fog">
+                    <div class="visual-card-meta">
+                        <h3>Misty Woodlands</h3>
+                        <span>Elevation 2,100M</span>
+                    </div>
+                </div>
+                <div class="visual-card">
+                    <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80" alt="Glacial Stream">
+                    <div class="visual-card-meta">
+                        <h3>Glacial Streams</h3>
+                        <span>Pure Flow Run</span>
+                    </div>
+                </div>
+                <div class="visual-card">
+                    <img src="https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=500&q=80" alt="High Plateau">
+                    <div class="visual-card-meta">
+                        <h3>Arid Outposts</h3>
+                        <span>Silent Expanses</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="curators-section" id="curators">
+        <div class="torn-divider torn-to-sand" style="position: absolute; top: 0; left: 0; transform: rotate(180deg);"></div>
+        <div class="container">
+            <div class="curators-intro reveal">
+                <span class="section-tag">03 // Pathkeepers</span>
+                <h2>Trail Curators</h2>
+                <p>We work exclusively with local terrain experts who verify safety parameters organically from inside the territory.</p>
+            </div>
+            
+            <div class="curators-grid">
+                <div class="curator-mini-card reveal">
+                    <div class="curator-thumb">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Kabir Dev">
+                    </div>
+                    <div class="curator-body">
+                        <h3>Kabir Dev</h3>
+                        <span>Alpine Highlands</span>
+                        <p>Specializes in routing secret passes across untracked shepherd slopes.</p>
+                    </div>
+                </div>
+
+                <div class="curator-mini-card reveal" style="transition-delay: 0.1s;">
+                    <div class="curator-thumb">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="Meera Sen">
+                    </div>
+                    <div class="curator-body">
+                        <h3>Meera Sen</h3>
+                        <span>Sylvan Woodlands</span>
+                        <p>Catalogs local foraging folklore and native old-growth valley pathways.</p>
+                    </div>
+                </div>
+
+                <div class="curator-mini-card reveal" style="transition-delay: 0.2s;">
+                    <div class="curator-thumb">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="Rohan K.">
+                    </div>
+                    <div class="curator-body">
+                        <h3>Rohan K.</h3>
+                        <span>Arid Basin Lines</span>
+                        <p>Maps zero-footprint astronomical tracks safely across desert dunes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="integrated-footer" id="coordinates">
+        <div class="torn-divider" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,40 C1050,15 900,65 750,30 C600,5 450,55 300,25 C150,5 75,35 0,15 Z' fill='%231C2B1F'/%3E%3C/svg%3E&quot;); position: absolute; top: -38px; left: 0; transform: rotate(180deg);"></div>
+        
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-left reveal">
+                    <h2>Ready to wander slower?</h2>
+                    <p>Unplug from the rush. Pin your favorite terrain coordinates below, and a dedicated pathkeeper will handle your navigation logistics.</p>
+                    <span class="scribble" style="color: var(--sunset-gold);">* Plans shift dynamically to match elements</span>
+                </div>
+                
+                <div class="footer-right reveal" style="transition-delay: 0.1s;">
+                    <form class="custom-form" onsubmit="event.preventDefault(); alert('Coordinates logged. Standby for curation details.');">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder=" " required>
+                            <label for="name">Your Identity / Call Sign</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder=" " required>
+                            <label for="email">Email Coordinates</label>
+                        </div>
+                        <div class="form-group">
+                            <select id="terrain" required style="color: var(--warm-cream); background: transparent;">
+                                <option value="" disabled selected hidden></option>
+                                <option value="alpine" style="background: var(--forest-dark);">High Alt Basin Meadows</option>
+                                <option value="sylvan" style="background: var(--forest-dark);">Old Growth Timber Valleys</option>
+                                <option value="arid" style="background: var(--forest-dark);">Quiet Desert Sand Dunes</option>
+                            </select>
+                            <label for="terrain" style="top: -1rem; font-size: 0.8rem; color: var(--sunset-gold);">Desired Topography</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--sand-beige); color: var(--forest-dark); box-shadow: 0 4px 0 rgba(253,251,247,0.15);">Initiate Slow Journey</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-base">
+                <p>&copy; 2026 offmap.in. Curated for deep explorers.</p>
+                <ul class="footer-socials">
+                    <li><a href="#">Journal Logs</a></li>
+                    <li><a href="https://www.instagram.com/bitsofeverywhere_">Instagram Moodboard</a></li>
+                    <li><a href="#">Footprint Audits</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // Fixed Compression Scroll Trigger for Navbar Links
+            const navbar = document.querySelector(".navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 40) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // Fluid Intersection Motion Observer for Section Reveals
+            const revealElements = document.querySelectorAll(".reveal");
+            const revealConfig = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -40px 0px"
+            };
+
+            const elementObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealConfig);
+
+            revealElements.forEach(el => elementObserver.observe(el));
+        });
+    </script>
+</body>
+</html>

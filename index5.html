@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap — Architectural Slow Travel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* -----------------------------------------------------------
+           1. FINE-ART DESIGN SYSTEM & DESIGNER VARIABLES
+        -------------------------------------------------------------- */
+        :root {
+            --bg-canvas: #FAF9F5;       /* Warm, high-end gallery bone-white */
+            --forest-deep: #162B1D;     /* Rich architectural forest velvet */
+            --forest-tint: #23422E;     /* Medium leaf balance accent */
+            --sand-warm: #F0EDE4;       /* Textural organic substrate sand */
+            --sand-dark: #D1C9B7;       /* Refined structural lines */
+            --charcoal: #1E1F1E;        /* Crisp high-contrast readable ink */
+            --text-muted: #6B756D;      /* Calm secondary commentary ink */
+            --pure-white: #FFFFFF;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-ui: 'Plus Jakarta Sans', sans-serif;
+            
+            --radius-display: 32px;
+            --radius-card: 16px;
+            --ease-signature: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-ui);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--charcoal);
+            overflow-x: hidden;
+            line-height: 1.65;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4rem;
+        }
+
+        /* Designer Typography Classes */
+        .serif-italic {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* -----------------------------------------------------------
+           2. NAVIGATION: ARCHITECTURAL SUSPENDED BAR
+        -------------------------------------------------------------- */
+        .nav-anchor {
+            position: fixed;
+            top: 2rem;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .nav-surface {
+            max-width: 1320px;
+            margin: 0 auto;
+            background: rgba(250, 249, 245, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(22, 43, 29, 0.08);
+            padding: 1.25rem 2.5rem;
+            border-radius: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: auto;
+            box-shadow: 0 10px 40px rgba(22, 43, 29, 0.03);
+        }
+
+        .brand-monogram {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.7rem;
+            letter-spacing: -1px;
+            color: var(--forest-deep);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-monogram span {
+            font-size: 0.6rem;
+            font-family: var(--font-ui);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid var(--forest-deep);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 3.5rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--charcoal);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: color 0.3s var(--ease-signature);
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--forest-deep);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s var(--ease-signature);
+        }
+
+        .nav-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-menu a:hover {
+            color: var(--forest-deep);
+        }
+
+        .nav-cta {
+            background: var(--forest-deep);
+            color: var(--bg-canvas);
+            text-decoration: none;
+            padding: 0.75rem 2rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.4s var(--ease-signature);
+            border: 1px solid var(--forest-deep);
+        }
+
+        .nav-cta:hover {
+            background: transparent;
+            color: var(--forest-deep);
+            box-shadow: 0 8px 24px rgba(22, 43, 29, 0.1);
+        }
+
+        /* -----------------------------------------------------------
+           3. HERO: MODERN ASYMMETRIC SPLIT STUDIO OVERLAY
+        -------------------------------------------------------------- */
+        .hero-studio {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            background-color: var(--bg-canvas);
+            padding-top: 7rem;
+        }
+
+        .hero-narrative-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 4rem 4rem 6rem;
+            position: relative;
+        }
+
+        .curated-ticker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .ticker-line {
+            width: 40px;
+            height: 1px;
+            background: var(--sand-dark);
+        }
+
+        .ticker-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--forest-tint);
+        }
+
+        .hero-title-sculpture {
+            font-family: var(--font-display);
+            font-size: clamp(3.5rem, 6vw, 5.5rem);
+            font-weight: 400;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            color: var(--forest-deep);
+            margin-bottom: 2rem;
+        }
+
+        .hero-editorial-subtext {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 540px;
+            margin-bottom: 3.5rem;
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        .hero-interactive-triggers {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        /* Premium Designer Interactive Button */
+        .studio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 2.5rem;
+            border-radius: 100px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s var(--ease-signature);
+            cursor: pointer;
+        }
+
+        .studio-btn-filled {
+            background: var(--forest-deep);
+            color: var(--bg-canvas);
+            border: 1px solid var(--forest-deep);
+        }
+
+        .studio-btn-filled:hover {
+            background: var(--forest-tint);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 43, 29, 0.15);
+        }
+
+        .studio-btn-ghost {
+            background: transparent;
+            color: var(--forest-deep);
+            border: 1px solid var(--sand-dark);
+        }
+
+        .studio-btn-ghost:hover {
+            border-color: var(--forest-deep);
+            background: rgba(22, 43, 29, 0.02);
+            transform: translateY(-3px);
+        }
+
+        /* Hero Right Cinematic Frame Showcase */
+        .hero-cinematic-frame {
+            position: relative;
+            padding: 3rem 4rem 3rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .canvas-media-wrapper {
+            width: 100%;
+            height: 80vh;
+            border-radius: var(--radius-display);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 30px 70px rgba(22, 43, 29, 0.12);
+        }
+
+        .canvas-media-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.05);
+            transition: transform 12s var(--ease-signature);
+        }
+
+        .hero-studio:hover .canvas-media-wrapper img {
+            transform: scale(1);
+        }
+
+        .floating-coordinates {
+            position: absolute;
+            bottom: 5rem;
+            left: -2rem;
+            background: var(--forest-deep);
+            color: var(--bg-canvas);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius-card);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .floating-coordinates h5 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 0.25rem;
+        }
+
+        .floating-coordinates p {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--sand-dark);
+        }
+
+        /* -----------------------------------------------------------
+           4. ABOUT: ASYMMETRIC MANIFESTO & INTERACTIVE JOURNEY TRACK
+        -------------------------------------------------------------- */
+        .manifesto-studio {
+            background: var(--sand-warm);
+            border-radius: var(--radius-display);
+            margin: 0 2rem;
+            padding: 8rem 4rem;
+        }
+
+        .manifesto-grid {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 6rem;
+            margin-bottom: 8rem;
+            align-items: flex-start;
+        }
+
+        .manifesto-sticky-title h2 {
+            font-family: var(--font-display);
+            font-size: 3.2rem;
+            font-weight: 400;
+            line-height: 1.15;
+            color: var(--forest-deep);
+            letter-spacing: -1px;
+        }
+
+        .manifesto-body-text p {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            line-height: 1.5;
+            color: var(--forest-tint);
+            margin-bottom: 2.5rem;
+        }
+
+        .manifesto-body-text span {
+            font-family: var(--font-ui);
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            display: block;
+            max-width: 620px;
+            line-height: 1.8;
+        }
+
+        /* Custom Horizontal Interactive Step Canvas Track */
+        .journey-track-header {
+            margin-bottom: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--sand-dark);
+            padding-bottom: 1.5rem;
+        }
+
+        .journey-track-header h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--forest-deep);
+        }
+
+        .track-scroller-canvas {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .track-node-card {
+            background: var(--bg-canvas);
+            padding: 3rem 2.25rem;
+            border-radius: var(--radius-card);
+            border: 1px solid rgba(22, 43, 29, 0.05);
+            transition: all 0.5s var(--ease-signature);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .track-node-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--forest-deep);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s var(--ease-signature);
+        }
+
+        .track-node-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .track-node-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(22, 43, 29, 0.06);
+        }
+
+        .node-index {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--sand-dark);
+            display: block;
+            margin-bottom: 2rem;
+            transition: color 0.4s ease;
+        }
+
+        .track-node-card:hover .node-index {
+            color: var(--forest-tint);
+        }
+
+        .track-node-card h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--forest-deep);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.3px;
+        }
+
+        .track-node-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* -----------------------------------------------------------
+           5. DESTINATIONS: CURATED PORTALS LAYOUT ARCHITECTURE
+        -------------------------------------------------------------- */
+        .portals-showcase {
+            padding: 10rem 0;
+        }
+
+        .portals-intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 6rem auto;
+        }
+
+        .portals-intro h2 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 400;
+            letter-spacing: -1px;
+            color: var(--forest-deep);
+            margin-bottom: 1.5rem;
+        }
+
+        .portals-intro p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .architectural-gallery {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 4rem;
+        }
+
+        /* Staggered Grid Shift Effect */
+        .gallery-column-stagger {
+            display: flex;
+            flex-direction: column;
+            gap: 5rem;
+        }
+
+        .gallery-column-stagger.offset-down {
+            padding-top: 6rem;
+        }
+
+        .portal-exhibit-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            group-name: portal;
+        }
+
+        .exhibit-view-box {
+            width: 100%;
+            aspect-ratio: 4/5;
+            border-radius: var(--radius-display);
+            overflow: hidden;
+            position: relative;
+            background: var(--sand-warm);
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 50px rgba(22, 43, 29, 0.05);
+        }
+
+        .exhibit-view-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s var(--ease-signature);
+        }
+
+        .portal-exhibit-card:hover .exhibit-view-box img {
+            transform: scale(1.05);
+        }
+
+        .exhibit-meta-tag {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(250, 249, 245, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 0.6rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--forest-deep);
+        }
+
+        .exhibit-annotation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--sand-warm);
+            padding-bottom: 1.25rem;
+        }
+
+        .exhibit-annotation-row h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--forest-deep);
+            margin-bottom: 0.25rem;
+        }
+
+        .exhibit-annotation-row p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .exhibit-pricing-node {
+            text-align: right;
+        }
+
+        .exhibit-cost {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--forest-tint);
+        }
+
+        .exhibit-duration {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        /* -----------------------------------------------------------
+           6. CONSOLE: COGNITIVE TRAVEL PLANNER INTERFACE
+        -------------------------------------------------------------- */
+        .planner-dashboard-section {
+            padding: 4rem 2rem 8rem 2rem;
+        }
+
+        .console-chassis {
+            background: var(--forest-deep);
+            color: var(--bg-canvas);
+            border-radius: var(--radius-display);
+            padding: 6rem;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 6rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 40px 90px rgba(22, 43, 29, 0.2);
+        }
+
+        .console-chassis::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(35, 66, 46, 0.4) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .console-brand-panel h2 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.15;
+            margin-bottom: 2rem;
+            letter-spacing: -1px;
+        }
+
+        .console-brand-panel p {
+            color: rgba(250, 249, 245, 0.7);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            max-width: 420px;
+            line-height: 1.7;
+        }
+
+        /* Structural Modular Planner Form Elements */
+        .interactive-modular-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-row-twin {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .interactive-field-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .interactive-field-block label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--sand-dark);
+        }
+
+        .interactive-field-block input, 
+        .interactive-field-block select {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(250, 249, 245, 0.15);
+            padding: 1.1rem 1.5rem;
+            border-radius: var(--radius-card);
+            color: var(--pure-white);
+            font-size: 1rem;
+            transition: all 0.4s var(--ease-signature);
+            outline: none;
+        }
+
+        .interactive-field-block input:focus, 
+        .interactive-field-block select:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--bg-canvas);
+            box-shadow: 0 0 0 4px rgba(250, 249, 245, 0.05);
+        }
+
+        /* Designer Styled Custom Multi-Choice Select Array */
+        .chip-selection-matrix {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.25rem;
+        }
+
+        .matrix-chip-label {
+            cursor: pointer;
+        }
+
+        .matrix-chip-label input {
+            display: none;
+        }
+
+        .custom-chip-body {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(250, 249, 245, 0.15);
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(250, 249, 245, 0.8);
+            transition: all 0.3s var(--ease-signature);
+            display: inline-block;
+        }
+
+        .matrix-chip-label input:checked + .custom-chip-body {
+            background: var(--bg-canvas);
+            color: var(--forest-deep);
+            border-color: var(--bg-canvas);
+            font-weight: 600;
+        }
+
+        .console-submit-trigger {
+            background: var(--bg-canvas);
+            color: var(--forest-deep);
+            border: 1px solid var(--bg-canvas);
+            padding: 1.25rem;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-signature);
+            margin-top: 1rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .console-submit-trigger:hover {
+            background: transparent;
+            color: var(--bg-canvas);
+            transform: translateY(-2px);
+        }
+
+        /* -----------------------------------------------------------
+           7. FOOTER: MODERN MINIMAL GRAPHIC CLOSURE
+        -------------------------------------------------------------- */
+        .studio-footer {
+            background: var(--sand-warm);
+            padding: 6rem 0 4rem 0;
+            border-top: 1px solid var(--sand-dark);
+        }
+
+        .footer-architectural-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 5rem;
+        }
+
+        .footer-brand-hub h4 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--forest-deep);
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand-hub p {
+            color: var(--text-muted);
+            max-width: 320px;
+            font-size: 0.95rem;
+        }
+
+        .footer-nav-columns {
+            display: flex;
+            gap: 6rem;
+        }
+
+        .footer-column-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .footer-column-stack h5 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--forest-deep);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-column-stack a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column-stack a:hover {
+            color: var(--forest-deep);
+        }
+
+        .footer-base-legal {
+            border-top: 1px solid rgba(22, 43, 29, 0.08);
+            padding-top: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* -----------------------------------------------------------
+           8. MASTERFUL RESPONSIVE LAYOUT CALIBRATION
+        -------------------------------------------------------------- */
+        @media (max-width: 1200px) {
+            .container { padding: 0 2.5rem; }
+            .hero-studio { grid-template-columns: 1fr; }
+            .hero-narrative-box { padding: 6rem 2.5rem 2rem 2.5rem; }
+            .hero-cinematic-frame { padding: 2.5rem; }
+            .canvas-media-wrapper { height: 60vh; }
+            .manifesto-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .track-scroller-canvas { grid-template-columns: repeat(2, 1fr); }
+            .console-chassis { grid-template-columns: 1fr; padding: 4rem 2.5rem; gap: 4rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; } /* Adaptive Clean Minimalist Collapse */
+            .manifesto-studio { margin: 0 1rem; padding: 5rem 1.5rem; }
+            .manifesto-sticky-title h2 { font-size: 2.5rem; }
+            .manifesto-body-text p { font-size: 1.5rem; }
+            .track-scroller-canvas { grid-template-columns: 1fr; }
+            .architectural-gallery { grid-template-columns: 1fr; gap: 3rem; }
+            .gallery-column-stagger.offset-down { padding-top: 0; }
+            .form-row-twin { grid-template-columns: 1fr; gap: 2.5rem; }
+            .footer-architectural-row { flex-direction: column; gap: 4rem; }
+            .footer-nav-columns { gap: 4rem; flex-wrap: wrap; }
+            .footer-base-legal { flex-direction: column; gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-anchor">
+        <header class="container">
+            <div class="nav-surface">
+                <a href="#" class="brand-monogram">OffMap <span>Slow</span></a>
+                <ul class="nav-menu">
+                    <li><a href="#manifesto">Manifesto</a></li>
+                    <li><a href="#portals">Curated Portals</a></li>
+                    <li><a href="#planner">Journey Planner</a></li>
+                </ul>
+                <a href="#planner" class="nav-cta">Begin Planning</a>
+            </div>
+        </header>
+    </div>
+
+    <main>
+        <section class="hero-studio">
+            <div class="hero-narrative-box">
+                <div class="curated-ticker">
+                    <div class="ticker-line"></div>
+                    <div class="ticker-text">An Antidote to Tourism</div>
+                </div>
+                <h1 class="hero-title-sculpture">
+                    Travel slow,<br>go <span class="serif-italic">Offmap!</span>
+                </h1>
+                <p class="hero-editorial-subtext">
+                    OffMap is meticulously engineered for the modern traveler seeking presence over pace. We refuse standardized checklists in favor of un-rushed loops, deeper regional integration, and rigorous self-scouted land exploration.
+                </p>
+                <div class="hero-interactive-triggers">
+                    <a href="#portals" class="studio-btn studio-btn-filled">Explore Curated Portals</a>
+                    <a href="#planner" class="studio-btn studio-btn-ghost">Launch Journey Engine</a>
+                </div>
+            </div>
+            
+            <div class="hero-cinematic-frame">
+                <div class="canvas-media-wrapper">
+                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=90" alt="Cinematic misty valley clearing">
+                    <div class="floating-coordinates">
+                        <h5>31.4504° N</h5>
+                        <p>Highland Wilderness Axis</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="manifesto" class="manifesto-studio">
+            <div class="manifesto-grid">
+                <div class="manifesto-sticky-title">
+                    <h2>Our<br><span class="serif-italic">Manifesto</span></h2>
+                </div>
+                <div class="manifesto-body-text">
+                    <p>
+                        We don’t arrange traditional sightseeing checklists. We cultivate deep geographic immersion around the fluid cadence of the destinations you visit.
+                    </p>
+                    <span>
+                        Travel shouldn't mirror an exhausting production sequence. We choose to stay anchored in fewer spaces, generating genuine connections with local communities and native families to curate true all-inclusive regional flow.
+                    </span>
+                </div>
+            </div>
+
+            <div class="journey-track-wrapper">
+                <div class="journey-track-header">
+                    <h3>The Exploration Sequence Map</h3>
+                    <p class="serif-italic" style="color: var(--text-muted);">How we craft your journey loop</p>
+                </div>
+                <div class="track-scroller-canvas">
+                    <div class="track-node-card">
+                        <span class="node-index">01/</span>
+                        <h4>Remote Scouting</h4>
+                        <p>We head deep inside uncharted valley loops completely solo to maps out paths firsthand before you ever arrive.</p>
+                    </div>
+                    <div class="track-node-card">
+                        <span class="node-index">02/</span>
+                        <h4>Kinship Alliances</h4>
+                        <p>We build respectful, direct operational partnerships with indigenous stewards and regional remote families.</p>
+                    </div>
+                    <div class="track-node-card">
+                        <span class="node-index">03/
+                        </span>
+                        <h4>Fluid Itineraries</h4>
+                        <p>We craft immersive 3-to-4 day regional loops entirely free from restrictive or stressful timelines.</p>
+                    </div>
+                    <div class="track-node-card">
+                        <span class="node-index">04/</span>
+                        <h4>Economic Cycles</h4>
+                        <p>We gather small, intentional groups from PAN India to directly fund and uplift isolated mountain micro-economies.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portals" class="container portals-showcase">
+            <div class="portals-intro">
+                <h2>Curated <span class="serif-italic">Portals</span></h2>
+                <p>Limited, high-presence seasonal expeditions meticulously tested by our field operations team.</p>
+            </div>
+
+            <div class="architectural-gallery">
+                <div class="gallery-column-stagger">
+                    <a href="#planner" class="portal-exhibit-card">
+                        <div class="exhibit-view-box">
+                            <span class="exhibit-meta-tag">Arid Highland Loop</span>
+                            <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1000&q=85" alt="Zanskar High Range Terrain">
+                        </div>
+                        <div class="exhibit-annotation-row">
+                            <div>
+                                <h3>Zanskar Silence Ridge</h3>
+                                <p>Deep Altitude Glacial Transits // India</p>
+                            </div>
+                            <div class="exhibit-pricing-node">
+                                <div class="exhibit-cost">₹18,500</div>
+                                <div class="exhibit-duration">5 Days Presence</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="gallery-column-stagger offset-down">
+                    <a href="#planner" class="portal-exhibit-card">
+                        <div class="exhibit-view-box">
+                            <span class="exhibit-meta-tag">Subtropical Loop</span>
+                            <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1000&q=85" alt="Khasi Cloud Forest Canopy">
+                        </div>
+                        <div class="exhibit-annotation-row">
+                            <div>
+                                <h3>Khasi Canopy Track</h3>
+                                <p>Ancient Forest Root-Bridges // India</p>
+                            </div>
+                            <div class="exhibit-pricing-node">
+                                <div class="exhibit-cost">₹14,200</div>
+                                <div class="exhibit-duration">4 Days Presence</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="planner" class="planner-dashboard-section">
+            <div class="container">
+                <div class="console-chassis">
+                    <div class="console-brand-panel">
+                        <h2>Journey<br><span class="serif-italic">Engineering</span> Console</h2>
+                        <p>Configure your primary travel metrics below. Our regional field directors will structure a slow-travel portfolio customized to your cadence.</p>
+                    </div>
+
+                    <form onsubmit="event.preventDefault(); alert('Transmission Successful. Your customized expedition portfolio is being assembled.');" class="interactive-modular-form">
+                        <div class="form-row-twin">
+                            <div class="interactive-field-block">
+                                <label for="client-name">Your Full Name</label>
+                                <input type="text" id="client-name" placeholder="Agastya Sen" required>
+                            </div>
+                            <div class="interactive-field-block">
+                                <label for="client-email">Digital Address</label>
+                                <input type="email" id="client-email" placeholder="sen@offmap.cc" required>
+                            </div>
+                        </div>
+
+                        <div class="interactive-field-block">
+                            <label>Expedition Portal Target</label>
+                            <div class="chip-selection-matrix">
+                                <label class="matrix-chip-label">
+                                    <input type="radio" name="destination-portal" value="zanskar" checked>
+                                    <span class="custom-chip-body">Zanskar Silence Ridge</span>
+                                </label>
+                                <label class="matrix-chip-label">
+                                    <input type="radio" name="destination-portal" value="khasi">
+                                    <span class="custom-chip-body">Khasi Canopy Track</span>
+                                </label>
+                                <label class="matrix-chip-label">
+                                    <input type="radio" name="destination-portal" value="undecided">
+                                    <span class="custom-chip-body">Undecided / Co-Explore</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="interactive-field-block">
+                            <label for="travel-pace">Desired Cadence</label>
+                            <select id="travel-pace">
+                                <option value="unrushed">Ultra-Slow (Max Time in Minimal Locations)</option>
+                                <option value="balanced">Fluid Flow (Steady Rhythm & Un-rushed Hikes)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="console-submit-trigger">Transmit Expedition Parameters</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="studio-footer">
+        <div class="container">
+            <div class="footer-architectural-row">
+                <div class="footer-brand-hub">
+                    <h4>OffMap</h4>
+                    <p>Designing architecture for deep geographic presence, slow exploration loops, and authentic remote community alliances.</p>
+                </div>
+                <div class="footer-nav-columns">
+                    <div class="footer-column-stack">
+                        <h5>Navigation</h5>
+                        <a href="#manifesto">Manifesto</a>
+                        <a href="#portals">Portals</a>
+                        <a href="#planner">Planner</a>
+                    </div>
+                    <div class="footer-column-stack">
+                        <h5>Social Axis</h5>
+                        <a href="#">Instagram</a>
+                        <a href="#">Expedition Logs</a>
+                        <a href="#">Field dispatches</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-base-legal">
+                <div>&copy; 2026 OffMap Exploration Labs. Engineered beautifully with absolute intent.</div>
+                <div>All Pre-Scouted Systems Active.</div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

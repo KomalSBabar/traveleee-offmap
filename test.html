@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OffMap | Travel Slow, Wander Deeper</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --forest:#254034;
+    --sage:#6B7D6A;
+    --sand:#F3EEE5;
+    --cream:#FBF9F4;
+    --charcoal:#1F2321;
+    --terracotta:#D9724B;
+    --gold:#C6A06C;
+
+    --display:'Playfair Display',serif;
+    --body:'Jost',sans-serif;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--cream);
+    color:var(--charcoal);
+    font-family:var(--body);
+    overflow-x:hidden;
+}
+
+.container{
+    width:90%;
+    max-width:1400px;
+    margin:auto;
+}
+
+section{
+    padding:120px 0;
+}
+
+img{
+    max-width:100%;
+    display:block;
+}
+
+a{
+    text-decoration:none;
+}
+
+h1,h2,h3{
+    font-family:var(--display);
+}
+
+p{
+    line-height:1.8;
+}
+
+/* ======================
+NAVBAR
+====================== */
+
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:999;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(0,0,0,.05);
+}
+
+.nav-wrapper{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    height:85px;
+}
+
+.logo{
+    font-size:32px;
+    color:var(--forest);
+    font-family:var(--display);
+    font-weight:700;
+}
+
+.nav-links{
+    display:flex;
+    gap:40px;
+}
+
+.nav-links a{
+    color:var(--charcoal);
+    font-weight:500;
+}
+
+.btn-nav{
+    background:var(--forest);
+    color:white;
+    padding:14px 28px;
+    border-radius:40px;
+}
+
+/* ======================
+HERO
+====================== */
+
+.hero{
+    height:100vh;
+    position:relative;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+}
+
+.hero video{
+    position:absolute;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.hero::before{
+    content:'';
+    position:absolute;
+    inset:0;
+
+    background:
+    linear-gradient(
+    rgba(37,64,52,.8),
+    rgba(37,64,52,.45)
+    );
+}
+
+.hero-content{
+    position:relative;
+    z-index:5;
+    max-width:750px;
+}
+
+.hero-sub{
+    color:var(--gold);
+    text-transform:uppercase;
+    letter-spacing:4px;
+    margin-bottom:20px;
+}
+
+.hero h1{
+    color:white;
+    font-size:clamp(3rem,8vw,6rem);
+    line-height:1;
+    margin-bottom:30px;
+}
+
+.hero h1 span{
+    color:var(--gold);
+}
+
+.hero p{
+    color:white;
+    font-size:1.2rem;
+    margin-bottom:40px;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:20px;
+}
+
+.btn-primary{
+    background:white;
+    color:var(--forest);
+    padding:18px 40px;
+    border-radius:50px;
+    font-weight:600;
+}
+
+.btn-outline{
+    border:1px solid white;
+    color:white;
+    padding:18px 40px;
+    border-radius:50px;
+}
+
+/* ======================
+WHY OFFMAP
+====================== */
+
+.section-title{
+    text-align:center;
+    margin-bottom:70px;
+}
+
+.section-title span{
+    color:var(--terracotta);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    font-size:.85rem;
+}
+
+.section-title h2{
+    font-size:3rem;
+    margin-top:15px;
+    color:var(--forest);
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:40px;
+}
+
+.feature-card{
+    background:white;
+    padding:50px;
+    border-radius:24px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.05);
+    transition:.4s;
+}
+
+.feature-card:hover{
+    transform:translateY(-10px);
+}
+
+.feature-icon{
+    font-size:3rem;
+    margin-bottom:20px;
+}
+
+.feature-card h3{
+    margin-bottom:15px;
+    color:var(--forest);
+}
+
+@media(max-width:992px){
+
+.features{
+grid-template-columns:1fr;
+}
+
+.nav-links{
+display:none;
+}
+
+.hero-buttons{
+flex-direction:column;
+}
+
+}
+/* ======================
+FEATURED JOURNEYS
+====================== */
+
+.journeys{
+    background:var(--sand);
+}
+
+.journey-grid{
+    display:flex;
+    flex-direction:column;
+    gap:50px;
+}
+
+.journey-card{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:white;
+    border-radius:30px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.06);
+}
+
+.journey-image{
+    height:420px;
+}
+
+.journey-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.journey-content{
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.duration{
+    color:var(--terracotta);
+    font-weight:600;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:15px;
+}
+
+.journey-content h3{
+    font-size:2rem;
+    color:var(--forest);
+    margin-bottom:20px;
+}
+
+.journey-content p{
+    margin-bottom:25px;
+}
+
+.journey-link{
+    color:var(--forest);
+    font-weight:600;
+}
+
+/* ======================
+HOW IT WORKS
+====================== */
+
+.process{
+    background:var(--cream);
+}
+
+.steps{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:30px;
+}
+
+.step{
+    text-align:center;
+    position:relative;
+}
+
+.step-number{
+    width:80px;
+    height:80px;
+    margin:auto;
+    border-radius:50%;
+    background:var(--forest);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+    font-weight:700;
+    margin-bottom:25px;
+}
+
+.step h3{
+    color:var(--forest);
+    margin-bottom:15px;
+}
+
+/* ======================
+TRAVEL GALLERY
+====================== */
+
+.gallery-section{
+    background:var(--forest);
+}
+
+.gallery-section .section-title h2{
+    color:white;
+}
+
+.gallery-section .section-title span{
+    color:var(--gold);
+}
+
+.gallery{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.gallery-item{
+    overflow:hidden;
+    border-radius:20px;
+}
+
+.gallery-item img{
+    width:100%;
+    height:350px;
+    object-fit:cover;
+    transition:.7s;
+}
+
+.gallery-item:hover img{
+    transform:scale(1.08);
+}
+
+@media(max-width:992px){
+
+.journey-card{
+grid-template-columns:1fr;
+}
+
+.journey-image{
+height:320px;
+}
+
+.journey-content{
+padding:35px;
+}
+
+.steps{
+grid-template-columns:1fr;
+}
+
+.gallery{
+grid-template-columns:1fr;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+<div class="container">
+
+<div class="nav-wrapper">
+
+<a href="#" class="logo">
+OffMap
+</a>
+
+<div class="nav-links">
+<a href="#about">About</a>
+<a href="#journeys">Journeys</a>
+<a href="#stories">Stories</a>
+<a href="#contact">Contact</a>
+</div>
+
+<a href="#contact" class="btn-nav">
+Plan Journey
+</a>
+
+</div>
+
+</div>
+
+</nav>
+
+<section class="hero">
+
+<video autoplay muted loop playsinline>
+<source src="v3.mp4" type="video/mp4">
+</video>
+
+<div class="container">
+
+<div class="hero-content">
+
+<div class="hero-sub">
+Travel Beyond Checklists
+</div>
+
+<h1>
+Travel Slow.
+<br>
+<span>Wander Deeper.</span>
+</h1>
+
+<p>
+Curated offbeat experiences for travellers who value stories, landscapes, and genuine connections over crowded itineraries.
+</p>
+
+<div class="hero-buttons">
+
+<a href="#journeys" class="btn-primary">
+Explore Journeys
+</a>
+
+<a href="#contact" class="btn-outline">
+Start Planning
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="about">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>Why OffMap</span>
+
+<h2>
+Travel With Intention
+</h2>
+
+</div>
+
+<div class="features">
+
+<div class="feature-card">
+
+<div class="feature-icon">
+🌿
+</div>
+
+<h3>Slow Travel</h3>
+
+<p>
+Experience destinations deeply rather than rushing through them.
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<div class="feature-icon">
+🏕️
+</div>
+
+<h3>Hidden Places</h3>
+
+<p>
+Discover locations far beyond crowded tourist routes.
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<div class="feature-icon">
+🤝
+</div>
+
+<h3>Local Connection</h3>
+
+<p>
+Meet people who know the stories, culture and soul of each place.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<section class="journeys" id="journeys">
+
+<div class="container">
+
+<div class="section-title">
+<span>Featured Experiences</span>
+<h2>Journeys Worth Remembering</h2>
+</div>
+
+<div class="journey-grid">
+
+<div class="journey-card">
+
+<div class="journey-image">
+<img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="journey-content">
+
+<div class="duration">9 Days</div>
+
+<h3>Hidden Himalayan Valleys</h3>
+
+<p>
+Stay with local mountain communities,
+walk forgotten shepherd trails,
+and experience the slower rhythms
+of life above the clouds.
+</p>
+
+<a href="#" class="journey-link">
+View Journey →
+</a>
+
+</div>
+
+</div>
+
+<div class="journey-card">
+
+<div class="journey-image">
+<img src="https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="journey-content">
+
+<div class="duration">12 Days</div>
+
+<h3>Desert Silence Expedition</h3>
+
+<p>
+Disconnect from the digital world,
+sleep beneath endless stars,
+and explore vast untouched landscapes.
+</p>
+
+<a href="#" class="journey-link">
+View Journey →
+</a>
+
+</div>
+
+</div>
+
+<div class="journey-card">
+
+<div class="journey-image">
+<img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="journey-content">
+
+<div class="duration">8 Days</div>
+
+<h3>Ancient Forest Trails</h3>
+
+<p>
+Follow centuries-old woodland routes,
+meet local conservationists,
+and reconnect with nature.
+</p>
+
+<a href="#" class="journey-link">
+View Journey →
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<section class="process">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>Simple Process</span>
+
+<h2>
+How OffMap Works
+</h2>
+
+</div>
+
+<div class="steps">
+
+<div class="step">
+
+<div class="step-number">
+01
+</div>
+
+<h3>Choose Terrain</h3>
+
+<p>
+Mountains, forests, deserts or hidden villages.
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+02
+</div>
+
+<h3>Tell Us Your Style</h3>
+
+<p>
+Adventure, culture, wellness or photography.
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+03
+</div>
+
+<h3>Custom Planning</h3>
+
+<p>
+We craft a meaningful route tailored to you.
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+04
+</div>
+
+<h3>Wander Slowly</h3>
+
+<p>
+Experience places deeply instead of rushing through them.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<section class="gallery-section" id="stories">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>Travel Journal</span>
+
+<h2>
+Moments From The Road
+</h2>
+
+</div>
+
+<div class="gallery">
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+<div class="gallery-item">
+<img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80">
+</div>
+
+</div>
+
+</div>
+
+</section>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap — Travel slow, go Offmap!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra+Display&family=Grenze+Gotisch:wght@400;600;700&family=Jost:wght@300;400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---------------------------------------------------------------- */
+        /* GLOBAL DESIGN SYSTEM & VARIABLES (Earthy, Fresh & Adventurous)    */
+        /* ---------------------------------------------------------------- */
+        :root {
+            --forest-green: #2B3E2D;     /* Deep, premium brand color */
+            --olive-drab: #5B6E58;
+            --sand-beige: #EBE5D8;      /* Rich organic scrapbook base texture */
+            --warm-cream: #FDFBF7;      /* Clean background tone */
+            --charcoal: #1E2220;
+            --muted-gold: #D4A359;      /* Sunset Ochre accent */
+            --accent-orange: #E06A3B;   /* Terracotta marker/highlight tone */
+            --white: #FFFFFF;
+            
+            --font-display: 'Grenze Gotisch', serif;
+            --font-accent: 'Almendra Display', serif;
+            --font-body: 'Jost', sans-serif;
+            --font-scribble: 'Caveat', cursive;
+            
+            --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Typography Configurations */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--forest-green);
+        }
+
+        p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.8;
+            color: rgba(30, 34, 32, 0.85);
+        }
+
+        .section-tag {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-orange);
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        /* Raw Handwritten Scribble Highlights */
+        .scribble-text {
+            font-family: var(--font-scribble);
+            color: var(--accent-orange);
+            font-size: 2.2rem;
+            line-height: 1;
+            transform: rotate(-3deg);
+            display: inline-block;
+        }
+
+        /* Layout Framework Utility */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4rem;
+        }
+
+        @media (max-width: 992px) { .container { padding: 0 2rem; } }
+
+        /* Raw Scrapbook Torn Paper Section Dividers */
+        .torn-divider-bottom {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23EBE5D8'/%3E%3C/svg%3E");
+            background-size: 100% 60px;
+            transform: rotate(180deg);
+        }
+
+        .torn-divider-top {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23FDFBF7'/%3E%3C/svg%3E");
+            background-size: 100% 60px;
+        }
+
+        /* Interactive Micro-Action Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.8rem;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            position: relative;
+            z-index: 1;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            box-shadow: 0 5px 0 var(--charcoal);
+        }
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 9px 0 var(--charcoal);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--warm-cream);
+            border: 2px dashed rgba(253, 251, 247, 0.6);
+        }
+        .btn-secondary:hover {
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            border-style: solid;
+            transform: translateY(-4px) rotate(1deg);
+        }
+
+        /* Modern Animation Triggers */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* GLOBAL NAVBAR (Prominent Logo Configurations)                   */
+        /* ---------------------------------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 2.5rem 0;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled {
+            padding: 1.2rem 0;
+            background-color: rgba(253, 251, 247, 0.96);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px var(--charcoal) dashed;
+        }
+        
+        /* Fixed visibility scales for the brand logo identifier */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            text-decoration: none;
+        }
+        .logo-brand-img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2.5px solid var(--warm-cream);
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .logo-brand-img {
+            border-color: var(--forest-green);
+            width: 52px;
+            height: 52px;
+        }
+
+        .logo-text {
+            font-family: var(--font-accent);
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: var(--warm-cream);
+            letter-spacing: 0.5px;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .logo-text { 
+            color: var(--forest-green); 
+            font-size: 1.9rem;
+        }
+        
+        .navbar-content-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            list-style: none;
+        }
+        .nav-menu a {
+            font-size: 0.95rem;
+            color: var(--warm-cream);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled .nav-menu a { color: var(--charcoal); }
+        .nav-menu a:hover { color: var(--muted-gold) !important; }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; } /* Kept clean for single-page presentation layout */
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* IMMERSIVE VIDEO HERO (Yeh Jawaani Hai Deewani Sunset Summit)      */
+        /* ---------------------------------------------------------------- */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--charcoal);
+        }
+        /* Background Cinematic Loop Engine */
+        .hero-video-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%) scale(1.05);
+            object-fit: cover;
+            pointer-events: none;
+            filter: brightness(0.65) contrast(1.05);
+            z-index: 1;
+        }
+        .hero-tint-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(30,34,32,0.2), rgba(30,34,32,0.75));
+            z-index: 2;
+        }
+        .hero-content { position: relative; z-index: 5; max-width: 900px; }
+        .hero h1 { font-size: clamp(3.8rem, 8vw, 6.8rem); color: var(--warm-cream); margin-bottom: 1.5rem; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .hero p { color: rgba(253, 251, 247, 0.95); margin-bottom: 3.5rem; max-width: 680px; font-size: 1.3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+        .hero-btn-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+        /* Cloud Brand Float Overlay Indicator */
+        .cloud-badge-watermark {
+            position: absolute;
+            right: 8%;
+            bottom: 18%;
+            width: 190px;
+            height: 190px;
+            z-index: 6;
+            animation: floatSlow 7s ease-in-out infinite;
+            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.4));
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(4deg); }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* THE SCRAPBOOK PHILOSOPHY                                         */
+        /* ---------------------------------------------------------------- */
+        .about { padding: 12rem 0; background-color: var(--sand-beige); position: relative; }
+        .about-split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: center; }
+        .about-text h2 { font-size: clamp(2.8rem, 5vw, 4.2rem); margin-bottom: 2rem; }
+        
+        .scrapbook-container { position: relative; width: 100%; height: 520px; }
+        .scrapbook-paper {
+            position: absolute;
+            background-color: var(--white);
+            padding: 16px 16px 48px 16px;
+            box-shadow: -5px 15px 35px rgba(0,0,0,0.12);
+            transition: var(--transition-bounce);
+            cursor: grab;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .scrapbook-paper img { width: 100%; height: 100%; object-fit: cover; filter: sepia(10%); }
+        .scrapbook-paper .caption {
+            font-family: var(--font-scribble);
+            color: var(--forest-green);
+            margin-top: 14px;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+        .paper-1 { width: 290px; height: 350px; top: 0; left: 5%; transform: rotate(-5deg); z-index: 3; }
+        .paper-2 { width: 310px; height: 370px; top: 70px; right: 5%; transform: rotate(6deg); z-index: 2; }
+        
+        .scrapbook-paper:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            z-index: 10 !important;
+            box-shadow: 0 30px 60px rgba(30, 34, 32, 0.25);
+        }
+
+        @media (max-width: 992px) {
+            .about-split { grid-template-columns: 1fr; gap: 5rem; }
+            .scrapbook-container { height: 460px; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* MASONRY GALLERY HARVEST (Fresh & Cool Visual Array)             */
+        /* ---------------------------------------------------------------- */
+        .gallery-section { padding: 12rem 0; background-color: var(--warm-cream); position: relative; }
+        .gallery-header { text-align: center; margin-bottom: 6rem; }
+        .gallery-header h2 { font-size: clamp(2.8rem, 6vw, 4.5rem); }
+        
+        .gallery-masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 240px;
+            gap: 2rem;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            transition: var(--transition-smooth);
+        }
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: var(--transition-smooth);
+        }
+        .gallery-overlay-card {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(43,62,45,0.85), transparent);
+            display: flex; align-items: flex-end; padding: 2rem;
+            opacity: 0; transition: var(--transition-smooth);
+        }
+        .gallery-overlay-card h4 { color: var(--warm-cream); font-size: 1.8rem; transform: translateY(20px); transition: var(--transition-smooth); }
+        
+        .gallery-item:hover { transform: translateY(-8px); box-shadow: 0 25px 45px rgba(43,62,45,0.2); }
+        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-item:hover .gallery-overlay-card { opacity: 1; }
+        .gallery-item:hover .gallery-overlay-card h4 { transform: translateY(0); }
+
+        /* Asymmetric Masonry Row-Span Modules */
+        .g-span-2h { grid-row: span 2; }
+        .g-span-2w { grid-column: span 2; }
+        .g-span-2w2h { grid-column: span 2; grid-row: span 2; }
+
+        @media (max-width: 992px) {
+            .gallery-masonry-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; }
+            .g-span-2w2h { grid-column: span 2; grid-row: span 2; }
+        }
+        @media (max-width: 576px) {
+            .gallery-masonry-grid { grid-template-columns: 1fr; grid-auto-rows: 250px; }
+            .gallery-item { grid-column: auto !important; grid-row: auto !important; }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* TRAIL CURATORS / TOUR GUIDES SECTION                             */
+        /* ---------------------------------------------------------------- */
+        .guides-section { padding: 12rem 0; background-color: var(--sand-beige); position: relative; overflow: hidden; }
+        .guides-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5rem; margin-top: 5rem; }
+        
+        .guide-profile-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 45px rgba(30,34,32,0.06);
+            transition: var(--transition-smooth);
+            border-bottom: 5px solid transparent;
+        }
+        .guide-img-box { width: 100%; height: 380px; overflow: hidden; position: relative; }
+        .guide-img-box img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-smooth); }
+        
+        .guide-details-box { padding: 2.5rem; text-align: center; position: relative; }
+        .guide-details-box h3 { font-size: 2.2rem; margin-bottom: 0.4rem; color: var(--forest-green); }
+        .guide-details-box span { font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--muted-gold); }
+        .guide-details-box p { margin-top: 1rem; font-size: 1rem; color: rgba(30,34,32,0.7); }
+
+        .guide-profile-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px rgba(43,62,45,0.15);
+            border-bottom-color: var(--accent-orange);
+        }
+        .guide-profile-card:hover .guide-img-box img { transform: scale(1.08); }
+
+        @media (max-width: 992px) { .guides-grid { grid-template-columns: 1fr; gap: 4rem; } }
+
+        /* ---------------------------------------------------------------- */
+        /* INTERACTIVE TOPOGRAPHIC PATHFINDER LAB                           */
+        /* ---------------------------------------------------------------- */
+        .pathfinder { padding: 12rem 0; background-color: var(--forest-green); color: var(--warm-cream); position: relative; overflow: hidden; }
+        .pathfinder h2 { color: var(--warm-cream); font-size: clamp(2.5rem, 5vw, 4rem); text-align: center; margin-bottom: 1rem; }
+        .pathfinder-subtitle { text-align: center; color: rgba(253, 251, 247, 0.7); margin-bottom: 6rem; font-size: 1.2rem; }
+        .map-interactive-wrapper { display: grid; grid-template-columns: 1.3fr 1fr; gap: 5rem; align-items: center; }
+
+        .map-vector-frame {
+            position: relative; background: rgba(253, 251, 247, 0.04); border: 2px dashed rgba(253, 251, 247, 0.15);
+            height: 500px; border-radius: 8px; box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
+        }
+        .map-svg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .map-node {
+            position: absolute; width: 50px; height: 50px; border-radius: 50%; background: var(--forest-green);
+            border: 3px solid var(--muted-gold); color: var(--muted-gold); display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-accent); font-size: 1.3rem; font-weight: bold; cursor: pointer; z-index: 5;
+            transition: var(--transition-bounce); box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .map-node:hover, .map-node.active { background: var(--muted-gold); color: var(--forest-green); transform: scale(1.25); box-shadow: 0 0 30px var(--muted-gold); }
+        .node-1 { top: 25%; left: 15%; }
+        .node-2 { top: 68%; left: 38%; }
+        .node-3 { top: 32%; left: 68%; }
+        .node-4 { top: 75%; left: 85%; }
+
+        .pathfinder-display-panel {
+            background: rgba(255, 255, 255, 0.06); padding: 4rem; border-radius: 6px;
+            backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); min-height: 350px;
+            display: flex; flex-direction: column; justify-content: center; position: relative;
+        }
+        .panel-content { display: none; animation: panelSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .panel-content.active { display: block; }
+
+        @keyframes panelSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .panel-content h4 { color: var(--muted-gold); font-size: 2.2rem; margin-bottom: 1.2rem; }
+        .panel-content p { color: rgba(253, 251, 247, 0.9); font-size: 1.15rem; }
+
+        @media (max-width: 992px) { .map-interactive-wrapper { grid-template-columns: 1fr; gap: 4rem; } .map-vector-frame { height: 380px; } }
+
+        /* ---------------------------------------------------------------- */
+        /* COORDINATES PLANNER & FOOTER BLOCK                              */
+        /* ---------------------------------------------------------------- */
+        .footer { background-color: var(--charcoal); color: var(--warm-cream); padding: 12rem 0 4rem 0; position: relative; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8rem; margin-bottom: 8rem; }
+        .footer-cta h2 { color: var(--warm-cream); font-size: clamp(2.8rem, 6vw, 4.5rem); margin-bottom: 2rem; }
+        .footer-cta p { color: rgba(253, 251, 247, 0.7); font-size: 1.2rem; margin-bottom: 2.5rem; }
+        
+        .interactive-form { display: flex; flex-direction: column; gap: 2.5rem; }
+        .form-row { position: relative; }
+        .interactive-form input, .interactive-form select {
+            width: 100%; padding: 1.2rem 0; background: transparent; border: none;
+            border-bottom: 2px dashed rgba(253, 251, 247, 0.2); color: var(--warm-cream);
+            font-family: var(--font-body); font-size: 1.1rem; outline: none; transition: 0.4s;
+        }
+        .interactive-form input:focus, .interactive-form select:focus { border-bottom-color: var(--muted-gold); border-bottom-style: solid; }
+        .interactive-form label { position: absolute; top: 1.2rem; left: 0; color: rgba(253, 251, 247, 0.4); pointer-events: none; transition: 0.3s; font-size: 1.05rem; }
+        
+        .interactive-form input:focus ~ label,
+        .interactive-form input:not(:placeholder-shown) ~ label {
+            top: -1rem; font-size: 0.85rem; color: var(--muted-gold); letter-spacing: 1px;
+        }
+
+        .footer-bottom { border-top: 1px dashed rgba(253, 251, 247, 0.15); padding-top: 4rem; display: flex; justify-content: space-between; align-items: center; }
+        .footer-bottom p { font-size: 0.95rem; color: rgba(253, 251, 247, 0.4); }
+        
+        .socials { display: flex; gap: 2.5rem; list-style: none; }
+        .socials a { color: rgba(253, 251, 247, 0.5); text-decoration: none; font-size: 0.95rem; letter-spacing: 1px; transition: 0.3s; }
+        .socials a:hover { color: var(--muted-gold); }
+
+        @media (max-width: 992px) { .footer-grid { grid-template-columns: 1fr; gap: 5rem; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container navbar-content-flex">
+            <a href="#" class="logo-container">
+                <img src="https://i.ibb.co/v6YgYvV/image-0157e0.png" alt="OffMap Cloud Logo Token" class="logo-brand-img">
+                <span class="logo-text">offmap.in</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#manifesto">Manifesto</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#curators">Curators</a></li>
+                <li><a href="#topology">Pathfinder</a></li>
+                <li><a href="#coordinates">Plan Route</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <video class="hero-video-bg" autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-beautiful-sunset-over-the-mountains-41710-large.mp4" type="video/mp4">
+        </video>
+        <div class="hero-tint-overlay"></div>
+        
+        <img src="https://i.ibb.co/v6YgYvV/image-0157e0.png" alt="Floating Cloud Asset" class="cloud-badge-watermark">
+        
+        <div class="container">
+            <div class="hero-content">
+                <span class="section-tag" style="color: var(--muted-gold);">Slow Vagabonding Movement</span>
+                <h1>Travel slow, go Offmap!</h1>
+                <p>Unplug entirely. Scale mountain summits to watch shifting light patterns across empty basins, without tracking timeline schedules or rush intervals.</p>
+                <div class="hero-btn-group">
+                    <a href="#gallery" class="btn btn-primary">Enter The Gallery</a>
+                    <a href="#coordinates" class="btn btn-secondary">Plot Coordinates</a>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom"></div>
+    </header>
+
+    <section class="about" id="manifesto">
+        <div class="container">
+            <div class="about-split">
+                <div class="about-text reveal">
+                    <span class="section-tag">01 // Zero Schedules</span>
+                    <h2>We don’t make trips around sightseeing.</h2>
+                    <p style="font-size: 1.4rem; font-family: var(--font-display); color: var(--forest-green); margin-bottom: 2rem; line-height: 1.4;">
+                        We curate open drifts. No standard tourist timelines—just organic wilderness flow.
+                    </p>
+                    <p style="margin-bottom: 2rem;">
+                        Modern tourism hurries your pace until local cultures and natural views blur entirely. We pause. We spend more days in fewer coordinates, learning local folklore and tracking remote paths before creating departure paths.
+                    </p>
+                    <span class="scribble-text">* Handcrafted custom lines</span>
+                </div>
+                
+                <div class="scrapbook-container reveal">
+                    <div class="scrapbook-paper paper-1">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80" alt="Mountain Basin">
+                        <div class="caption">Alps Basin Drift // 04</div>
+                    </div>
+                    <div class="scrapbook-paper paper-2">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=80" alt="High Alt Peak Sunset">
+                        <div class="caption">Summit Horizon Vibe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%23FDFBF7'/%3E%3C/svg%3E&quot;); transform: none;"></div>
+    </section>
+
+    <section class="gallery-section" id="gallery">
+        <div class="container">
+            <div class="gallery-header reveal">
+                <span class="section-tag">02 // Sylvan Captures</span>
+                <h2>Visual Records From The Offbeat</h2>
+            </div>
+            
+            <div class="gallery-masonry-grid">
+                <div class="gallery-item g-span-2w2h reveal">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=800&q=80" alt="High ridges explorer">
+                    <div class="gallery-overlay-card">
+                        <h4>Ridge Paths</h4>
+                    </div>
+                </div>
+                <div class="gallery-item g-span-2h reveal">
+                    <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=600&q=80" alt="Timber woodland fog">
+                    <div class="gallery-overlay-card">
+                        <h4>Misty Woodlands</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80" alt="Glacial river drift">
+                    <div class="gallery-overlay-card">
+                        <h4>River Runs</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=500&q=80" alt="Distant high plateau outpost">
+                    <div class="gallery-overlay-card">
+                        <h4>Outposts</h4>
+                    </div>
+                </div>
+                <div class="gallery-item g-span-2w reveal">
+                    <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80" alt="Altiplano green meadows sunset valleys">
+                    <div class="gallery-overlay-card">
+                        <h4>Sunset Valleys</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="guides-section" id="curators">
+        <div class="torn-divider-top"></div>
+        <div class="container">
+            <div style="text-align: center;" class="reveal">
+                <span class="section-tag">03 // Pathkeepers</span>
+                <h2>Meet Your Trail Curators</h2>
+                <p style="max-width: 600px; margin: 0 auto; color: rgba(30,34,32,0.75);">We skip standard booking brokers. These local experts plan your route maps organically from the inside out.</p>
+            </div>
+            
+            <div class="guides-grid">
+                <div class="guide-profile-card reveal">
+                    <div class="guide-img-box">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Kabir Dev, Alpine Curator">
+                    </div>
+                    <div class="guide-details-box">
+                        <h3>Kabir Dev</h3>
+                        <span>Alpine Highlands</span>
+                        <p>Specializes in route planning across uncharted highland pastures and old stone shepherd routes.</p>
+                    </div>
+                </div>
+
+                <div class="guide-profile-card reveal" style="transition-delay: 0.1s;">
+                    <div class="guide-img-box">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" alt="Meera Sen, Botanical Historian">
+                    </div>
+                    <div class="guide-details-box">
+                        <h3>Meera Sen</h3>
+                        <span>Botanical Historian</span>
+                        <p>Guides paths through native old-growth woods, cataloging local foraging secrets along stream flows.</p>
+                    </div>
+                </div>
+
+                <div class="guide-profile-card reveal" style="transition-delay: 0.2s;">
+                    <div class="guide-img-box">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80" alt="Rohan K., Desert Tracker">
+                    </div>
+                    <div class="guide-details-box">
+                        <h3>Rohan K.</h3>
+                        <span>Desert Cartographer</span>
+                        <p>Maps open tracking loops across vast, quiet sand dunes and ancient arid trade pathways safely.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%232B3E2D'%3E%3C/path%3E%3C/svg%3E\"); transform: none;"></div>
+    </section>
+
+    <section class="pathfinder" id="topology">
+        <div class="container">
+            <span class="section-tag" style="text-align: center; color: var(--muted-gold);">04 // Interactive Exploration</span>
+            <h2>The Topology Selector</h2>
+            <p class="pathfinder-subtitle">Click map coordinate anchors to preview alternative, slower backcountry route types.</p>
+            
+            <div class="map-interactive-wrapper">
+                <div class="map-vector-frame">
+                    <svg class="map-svg-canvas">
+                        <path d="M 90 100 Q 220 320 200 270 T 400 140 T 500 320" fill="none" stroke="rgba(214,163,89,0.35)" stroke-width="3" stroke-dasharray="12,8" />
+                    </svg>
+                    
+                    <div class="map-node node-1 active" data-index="panel-1">I</div>
+                    <div class="map-node node-2" data-index="panel-2">II</div>
+                    <div class="map-node node-3" data-index="panel-3">III</div>
+                    <div class="map-node node-4" data-index="panel-4">IV</div>
+                </div>
+
+                <div class="pathfinder-display-panel">
+                    <div class="panel-content panel-1 active">
+                        <h4>I // Slow Thresholds</h4>
+                        <p>Skip the early morning tour bus rush. Wake up late and watch fog lines burn off valleys while drinking hand-roasted local teas.</p>
+                    </div>
+                    <div class="panel-content panel-2">
+                        <h4>II // Foraging Trails</h4>
+                        <p>Spend afternoons gathering wild mushrooms or cataloging herbs with village elders instead of looking down through glass tour buses.</p>
+                    </div>
+                    <div class="panel-content panel-3">
+                        <h4>III // Offbeat Outposts</h4>
+                        <p>Step completely away from pre-paved concrete platforms. Hike old pathways carved purely by natural mountain curves.</p>
+                    </div>
+                    <div class="panel-content panel-4">
+                        <h4>IV // Pure Horizon Stills</h4>
+                        <p>Settle into countryside homestays where the daily routine slows down to match the natural cycles of the terrain.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1120,50 1060,15 980,35 C900,55 840,25 760,45 C680,65 620,35 540,20 C460,5 400,55 320,45 C240,35 180,65 100,45 C50,35 25,50 0,25 Z' fill='%231E2220'%3E%3C/path%3E%3C/svg%3E\"); transform: none;"></div>
+    </section>
+
+    <footer class="footer" id="coordinates">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-cta reveal">
+                    <h2>Ready to wander slower?</h2>
+                    <p>Ditch the fast-paced timeline grid. Tell us your favorite type of remote scenery, and let's map an open drift route safely.</p>
+                    <span class="scribble-text" style="color: var(--muted-gold);">* Plans adjust to real weather changes</span>
+                </div>
+                
+                <div class="footer-form-wrapper reveal" style="transition-delay: 0.1s;">
+                    <form class="interactive-form" onsubmit="event.preventDefault(); alert('Coordinates cataloged. A pathkeeper will reach out shortly.');">
+                        <div class="form-row">
+                            <input type="text" id="username" placeholder=" " required>
+                            <label for="username">Your Identity Name</label>
+                        </div>
+                        <div class="form-row">
+                            <input type="email" id="useremail" placeholder=" " required>
+                            <label for="useremail">Email Coordinates</label>
+                        </div>
+                        <div class="form-row">
+                            <select id="userterrain" required style="color: var(--warm-cream); background: transparent;">
+                                <option value="" disabled selected hidden></option>
+                                <option value="alpine" style="background: var(--charcoal);">High Alt Pasture Basins</option>
+                                <option value="sylvan" style="background: var(--charcoal);">Old Growth Woods</option>
+                                <option value="arid" style="background: var(--charcoal);">Silent Sand Dunes</option>
+                            </select>
+                            <label for="userterrain" style="top: -1rem; font-size: 0.85rem; color: var(--muted-gold);">Desired Terrain Vibe</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--sand-beige); color: var(--charcoal); box-shadow: 0 4px 0 rgba(253,251,247,0.2);">Initiate Drift</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 offmap.in. Curated with absolute intent.</p>
+                <ul class="socials">
+                    <li><a href="#">Journal Logs</a></li>
+                    <li><a href="https://www.instagram.com/bitsofeverywhere_">Instagram Moodboard</a></li>
+                    <li><a href="#">Footprint Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. NAVBAR FIXED RESPONSIVE HEADER COMPRESSION
+            const navbar = document.querySelector(".navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 40) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // 2. PATHFINDER LABORATORY COORDINATE NODE CHANGER
+            const mapNodes = document.querySelectorAll(".map-node");
+            const dataPanels = document.querySelectorAll(".panel-content");
+
+            mapNodes.forEach(node => {
+                node.addEventListener("click", () => {
+                    mapNodes.forEach(n => n.classList.remove("active"));
+                    dataPanels.forEach(p => p.classList.remove("active"));
+
+                    node.classList.add("active");
+                    const targetIndexId = node.getAttribute("data-index");
+                    document.querySelector(`.${targetIndexId}`).classList.add("active");
+                });
+            });
+
+            // 3. MOTION OBSERVER INTERSECTION REVEAL CONTROLLER
+            const scrollElements = document.querySelectorAll(".reveal");
+            const observerConfiguration = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -30px 0px"
+            };
+
+            const scrollRevealIntersectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerConfiguration);
+
+            scrollElements.forEach(elem => scrollRevealIntersectionObserver.observe(elem));
+        });
+    </script>
+</body>
+</html>

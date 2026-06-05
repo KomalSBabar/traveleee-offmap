@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap — Travel slow, go Offmap!</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Permanent+Marker&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ---------------------------------------------------------------- */
+        /* 1. BRAND DESIGN SYSTEM & ROOT VARIABLES                          */
+        /* ---------------------------------------------------------------- */
+        :root {
+            --forest-green: #2B4236;
+            --olive-drab: #4A5D4E;
+            --sand-beige: #EFEAE2;
+            --warm-cream: #F9F6F0;
+            --charcoal: #1E2220;
+            --muted-gold: #C5A075;
+            --accent-orange: #D96B43;
+            --white: #FFFFFF;
+
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Jost', sans-serif;
+            --font-scribble: 'Permanent Marker', cursive;
+
+            --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.15;
+            color: var(--forest-green);
+        }
+
+        p {
+            font-size: 1.05rem;
+            font-weight: 300;
+            line-height: 1.75;
+            color: rgba(30, 34, 32, 0.85);
+        }
+
+        .section-tag {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .scribble-text {
+            font-family: var(--font-scribble);
+            color: var(--accent-orange);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            transform: rotate(-4deg);
+            display: inline-block;
+        }
+
+        /* Layout & Utilities */
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 5rem;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                padding: 0 2rem;
+            }
+        }
+
+        /* Raw Torn/Paper Edge Dividers */
+        .torn-divider-bottom {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,20 C1140,40 1080,10 1020,30 C960,50 900,20 840,40 C780,60 720,30 660,20 C600,10 540,50 480,40 C420,30 360,60 300,40 C240,20 180,50 120,30 C60,10 30,40 0,20 Z' fill='%23EFEAE2'/%3E%3C/svg%3E");
+            background-size: 100% 40px;
+            transform: rotate(180deg);
+        }
+
+        .torn-divider-top {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,20 C1140,40 1080,10 1020,30 C960,50 900,20 840,40 C780,60 720,30 660,20 C600,10 540,50 480,40 C420,30 360,60 300,40 C240,20 180,50 120,30 C60,10 30,40 0,20 Z' fill='%23F9F6F0'/%3E%3C/svg%3E");
+            background-size: 100% 40px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.1rem 2.4rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            position: relative;
+            z-index: 1;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) rotate(-1deg);
+            box-shadow: 0 15px 30px rgba(43, 66, 54, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--warm-cream);
+            border: 1px solid rgba(249, 246, 240, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--warm-cream);
+            color: var(--charcoal);
+            transform: translateY(-4px) rotate(1deg);
+        }
+
+        /* Scroll Animation Target */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 1: NAVIGATION & DRAWER                                   */
+        /* ---------------------------------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 2.5rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            padding: 1.2rem 0;
+            background-color: rgba(249, 246, 240, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(43, 66, 54, 0.08);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--warm-cream);
+            text-decoration: none;
+        }
+
+        .navbar.scrolled .logo {
+            color: var(--forest-green);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 3.5rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            font-size: 0.9rem;
+            color: var(--warm-cream);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: var(--transition-quick);
+        }
+
+        .navbar.scrolled .nav-menu a {
+            color: var(--charcoal);
+        }
+
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .burger-menu span {
+            width: 28px;
+            height: 2px;
+            background-color: var(--warm-cream);
+            transition: 0.3s;
+        }
+
+        .navbar.scrolled .burger-menu span {
+            background-color: var(--charcoal);
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .burger-menu {
+                display: flex;
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 2: CINEMATIC HERO BLOCK                                  */
+        /* ---------------------------------------------------------------- */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--charcoal);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 115%;
+            overflow: hidden;
+        }
+
+        .hero-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg,
+                    rgba(30, 34, 32, .88) 0%,
+                    rgba(30, 34, 32, .65) 35%,
+                    rgba(30, 34, 32, .25) 70%,
+                    rgba(30, 34, 32, .15) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            color: var(--warm-cream);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .hero p {
+            color: rgba(249, 246, 240, 0.9);
+            margin-bottom: 3rem;
+            max-width: 650px;
+        }
+
+        .hero-btn-group {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 576px) {
+            .hero-btn-group {
+                flex-direction: column;
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 3: THE ART OF FLOW (ABOUT)                               */
+        /* ---------------------------------------------------------------- */
+        .about {
+            padding: 12rem 0;
+            background-color: var(--sand-beige);
+            position: relative;
+        }
+
+        .about-split {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        /* Interactive Scrapbook Stacking Composition */
+        .scrapbook-container {
+            position: relative;
+            width: 100%;
+            height: 520px;
+        }
+
+        .scrapbook-paper {
+            position: absolute;
+            background-color: var(--white);
+            padding: 15px 15px 50px 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            transition: var(--transition-bounce);
+            cursor: grab;
+        }
+
+        .scrapbook-paper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scrapbook-paper .caption {
+            font-family: var(--font-scribble);
+            color: var(--olive-drab);
+            margin-top: 12px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .paper-1 {
+            width: 280px;
+            height: 340px;
+            top: 0;
+            left: 10%;
+            transform: rotate(-6deg);
+            z-index: 3;
+        }
+
+        .paper-2 {
+            width: 310px;
+            height: 380px;
+            top: 80px;
+            right: 5%;
+            transform: rotate(5deg);
+            z-index: 2;
+        }
+
+        .paper-3 {
+            width: 240px;
+            height: 300px;
+            bottom: -20px;
+            left: 20%;
+            transform: rotate(-12deg);
+            z-index: 1;
+        }
+
+        /* Dynamic hovering layout mechanics */
+        .scrapbook-paper:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            z-index: 10 !important;
+            box-shadow: 0 30px 60px rgba(43, 66, 54, 0.25);
+        }
+
+        @media (max-width: 992px) {
+            .about-split {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .scrapbook-container {
+                height: 450px;
+            }
+
+            .paper-1 {
+                width: 220px;
+                height: 280px;
+            }
+
+            .paper-2 {
+                width: 240px;
+                height: 310px;
+            }
+
+            .paper-3 {
+                width: 190px;
+                height: 240px;
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 4: SLOW TRAJECTORIES (ASYSMMETRIC STREAMFLOW)            */
+        /* ---------------------------------------------------------------- */
+        .journeys {
+            padding: 10rem 0;
+            background-color: var(--warm-cream);
+            position: relative;
+        }
+
+        .journeys-header {
+            text-align: center;
+            margin-bottom: 7rem;
+        }
+
+        .journeys-header h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+        }
+
+        /* Asymmetric Streamflow Grid Layout */
+        .streamflow-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            row-gap: 12rem;
+        }
+
+        .stream-card {
+            position: relative;
+            background: transparent;
+            transition: var(--transition-smooth);
+        }
+
+        /* Offset positions simulating organic, unexpected layouts */
+        .card-left {
+            grid-column: 1 / span 5;
+        }
+
+        .card-center {
+            grid-column: 7 / span 5;
+            margin-top: 6rem;
+        }
+
+        .card-right {
+            grid-column: 3 / span 6;
+        }
+
+        .stream-img-wrapper {
+            width: 100%;
+            height: 480px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 4px;
+            box-shadow: 0 20px 45px rgba(43, 66, 54, 0.08);
+        }
+
+        .stream-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stream-card:hover .stream-img-wrapper img {
+            transform: scale(1.08);
+        }
+
+        /* Overlapping text banners breaking the grid bounding boxes */
+        .stream-info-banner {
+            position: absolute;
+            bottom: -50px;
+            right: -30px;
+            background: var(--white);
+            padding: 2.5rem;
+            width: 85%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--forest-green);
+            z-index: 5;
+            transition: var(--transition-bounce);
+        }
+
+        .stream-card:hover .stream-info-banner {
+            transform: translate(-10px, -10px);
+            box-shadow: 0 25px 50px rgba(43, 66, 54, 0.15);
+        }
+
+        .stream-info-banner h3 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stream-info-banner p {
+            font-size: 0.95rem;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .tag-badge {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--accent-orange);
+            color: var(--white);
+            padding: 4px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 992px) {
+            .streamflow-grid {
+                grid-template-columns: 1fr;
+                gap: 8rem;
+                row-gap: 8rem;
+            }
+
+            .stream-card {
+                grid-column: auto !important;
+                margin-top: 0 !important;
+            }
+
+            .stream-img-wrapper {
+                height: 380px;
+            }
+
+            .stream-info-banner {
+                width: 100%;
+                right: 0;
+                bottom: -60px;
+                padding: 1.5rem;
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 5: INTERACTIVE PATHFINDER MAP EXPERIMENT                  */
+        /* ---------------------------------------------------------------- */
+        .pathfinder {
+            padding: 10rem 0;
+            background-color: var(--forest-green);
+            color: var(--warm-cream);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pathfinder h2 {
+            color: var(--warm-cream);
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .pathfinder-subtitle {
+            text-align: center;
+            color: rgba(249, 246, 240, 0.7);
+            margin-bottom: 5rem;
+        }
+
+        .map-interactive-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        /* Minimal Vector Topography Simulation Frame */
+        .map-vector-frame {
+            position: relative;
+            background: rgba(249, 246, 240, 0.03);
+            border: 1px solid rgba(249, 246, 240, 0.1);
+            height: 450px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Custom dynamic background canvas line */
+        .map-svg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .map-node {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--forest-green);
+            border: 2px solid var(--muted-gold);
+            color: var(--muted-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+            transition: var(--transition-bounce);
+        }
+
+        .map-node:hover,
+        .map-node.active {
+            background: var(--muted-gold);
+            color: var(--forest-green);
+            transform: scale(1.2);
+            box-shadow: 0 0 25px var(--muted-gold);
+        }
+
+        .node-1 {
+            top: 20%;
+            left: 15%;
+        }
+
+        .node-2 {
+            top: 65%;
+            left: 35%;
+        }
+
+        .node-3 {
+            top: 30%;
+            left: 65%;
+        }
+
+        .node-4 {
+            top: 75%;
+            left: 80%;
+        }
+
+        /* Pathfinder Panel Display Contexts */
+        .pathfinder-display-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3.5rem;
+            border-radius: 6px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .panel-content {
+            display: none;
+            animation: panelFade 0.5s ease forwards;
+        }
+
+        .panel-content.active {
+            display: block;
+        }
+
+        @keyframes panelFade {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .panel-content h4 {
+            color: var(--muted-gold);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel-content p {
+            color: rgba(249, 246, 240, 0.85);
+        }
+
+        @media (max-width: 992px) {
+            .map-interactive-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .map-vector-frame {
+                height: 350px;
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 6: ECHOES FROM THE TRAILS (STAGGERED ROADSIDES)          */
+        /* ---------------------------------------------------------------- */
+        .testimonials {
+            padding: 12rem 0;
+            background-color: var(--sand-beige);
+            position: relative;
+        }
+
+        .testimonials h2 {
+            text-align: center;
+            font-size: clamp(2.3rem, 4vw, 3.5rem);
+            margin-bottom: 6rem;
+        }
+
+        /* Asymmetric Staggered Track Columns */
+        .staggered-track {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .track-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Offset alternate pipeline down columns */
+        .track-column:nth-child(2) {
+            transform: translateY(50px);
+        }
+
+        .journal-card {
+            background: var(--white);
+            padding: 3rem;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03);
+            border-radius: 2px;
+        }
+
+        .journal-card p {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .journal-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .journal-meta img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .journal-meta h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--forest-green);
+        }
+
+        @media (max-width: 768px) {
+            .staggered-track {
+                flex-direction: column;
+            }
+
+            .track-column:nth-child(2) {
+                transform: translateY(0);
+            }
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* SECTION 7: INTERACTIVE PLANNER & UNIFIED BASE                    */
+        /* ---------------------------------------------------------------- */
+        .footer {
+            background-color: var(--charcoal);
+            color: var(--warm-cream);
+            padding: 10rem 0 3rem 0;
+            position: relative;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            margin-bottom: 8rem;
+        }
+
+        .footer-cta h2 {
+            color: var(--warm-cream);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 2rem;
+        }
+
+        .interactive-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-row {
+            position: relative;
+        }
+
+        .interactive-form input,
+        .interactive-form select {
+            width: 100%;
+            padding: 1.2rem 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(249, 246, 240, 0.2);
+            color: var(--warm-cream);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .interactive-form input:focus,
+        .interactive-form select:focus {
+            border-bottom-color: var(--muted-gold);
+        }
+
+        .interactive-form label {
+            position: absolute;
+            top: 1.2rem;
+            left: 0;
+            color: rgba(249, 246, 240, 0.4);
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .interactive-form input:focus~label,
+        .interactive-form input:not(:placeholder-shown)~label {
+            top: -0.8rem;
+            font-size: 0.8rem;
+            color: var(--muted-gold);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(249, 246, 240, 0.08);
+            padding-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 0.9rem;
+            color: rgba(249, 246, 240, 0.4);
+        }
+
+        .socials {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .socials a {
+            color: rgba(249, 246, 240, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .socials a:hover {
+            color: var(--muted-gold);
+        }
+
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+        }
+
+
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-brand img {
+            height: 60px;
+        }
+
+        .hero-brand span {
+            color: var(--warm-cream);
+            letter-spacing: 4px;
+            font-size: .9rem;
+        }
+
+        /*  */
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="">
+                <!-- <img src="img/logo.PNG" alt="OffMap" height="100px"> -->
+                <!-- <span>OFFMAP</span> -->
+            </div>
+            <!-- <ul class="nav-menu">
+                <li><a href="#about">Philosophy</a></li>
+                <li><a href="#journeys">Trajectories</a></li>
+                <li><a href="#pathfinder">Pathfinder Explorer</a></li>
+                <li><a href="#planner">Plan Route</a></li>
+            </ul> -->
+            <!-- <div class="burger-menu" onclick="document.querySelector('.nav-menu').style.display = document.querySelector('.nav-menu').style.display === 'flex' ? 'none' : 'flex'">
+                <span></span><span></span><span></span>
+            </div> -->
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-bg" id="hero-parallax">
+
+            <video autoplay muted loop playsinline>
+                <source src="v3.mp4" type="video/mp4">
+            </video>
+
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <!-- <span class="section-tag" style="color: var(--muted-gold);">Alternative Vagabonding</span> -->
+                <h1>Travel slow,<br> Wander Deeper!</h1>
+                <p class="hero-tagline">
+                    Go OffMap.
+                </p>
+                <p>OffMap is designed for those seeking to unplug entirely. Hike without tracking intervals, watch the
+                    changing light across mountain basins, and settle into landscapes deeply.</p>
+                <div class="hero-btn-group">
+                    <a href="#journeys" class="btn btn-primary">Enter the Stream</a>
+                    <a href="#planner" class="btn btn-secondary">Plot Coordinates</a>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom"></div>
+    </header>
+
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-split">
+                <div class="about-text reveal">
+                    <span class="section-tag">01 // Alternative Core</span>
+                    <h2>We don’t plan trips around standard sightseeing.</h2>
+                    <p style="font-size: 1.3rem; font-style: italic; color: var(--olive-drab); margin-bottom: 2rem;">
+                        We curate slow drifts. No clock timelines, no rigid tracking grids. Just flow.
+                    </p>
+                    <p style="margin-bottom: 1.5rem;">
+                        Standard modern tourism accelerates your pace until environments blur together. We turn
+                        backward. We research destinations by living inside them long before mapping a departure trail.
+                    </p>
+                    <span class="scribble-text" style="margin-top: 1rem;">* Loose boots & completely open paths</span>
+                </div>
+
+                <div class="scrapbook-container reveal">
+                    <div class="scrapbook-paper paper-1">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=500&q=80"
+                            alt="Remote valley cabin">
+                        <div class="caption">Alps Ridge Drift — 04</div>
+                    </div>
+                    <div class="scrapbook-paper paper-2">
+                        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80"
+                            alt="River boat slow tracking">
+                        <div class="caption">Mist Valley Riverbeds</div>
+                    </div>
+                    <div class="scrapbook-paper paper-3">
+                        <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=500&q=80"
+                            alt="Deep forest trails">
+                        <div class="caption">Archaic Path Finding</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom"
+            style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,20 C1140,40 1080,10 1020,30 C960,50 900,20 840,40 C780,60 720,30 660,20 C600,10 540,50 480,40 C420,30 360,60 300,40 C240,20 180,50 120,30 C60,10 30,40 0,20 Z' fill='%23F9F6F0'/%3E%3C/svg%3E&quot;); fill: var(--warm-cream);">
+        </div>
+    </section>
+
+    <section class="journeys" id="journeys">
+        <div class="container">
+            <div class="journeys-header reveal">
+                <span class="section-tag">02 // Open Tracks</span>
+                <h2>Slower Trajectories</h2>
+            </div>
+
+            <div class="streamflow-grid">
+                <div class="stream-card card-left reveal">
+                    <div class="stream-img-wrapper">
+                        <span class="tag-badge">9 Days Path</span>
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80"
+                            alt="Hidden Valley Outpost">
+                    </div>
+                    <div class="stream-info-banner">
+                        <h3>Isolated Outposts of Higher Valleys</h3>
+                        <p>Ditch standard observation viewing decks. Settle into an isolated high-altitude stone farming
+                            homestead for five consecutive nights.</p>
+                    </div>
+                </div>
+
+                <div class="stream-card card-center reveal">
+                    <div class="stream-img-wrapper">
+                        <span class="tag-badge">12 Days Path</span>
+                        <img src="https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=900&q=80"
+                            alt="Arid Topography Dunes">
+                    </div>
+                    <div class="stream-info-banner">
+                        <h3>Muted Sands & Empty Topography</h3>
+                        <p>Immerse yourself in vast, silent desert vistas. Sleep under unfiltered star systems away from
+                            modern infrastructure grids.</p>
+                    </div>
+                </div>
+
+                <div class="stream-card card-right reveal">
+                    <div class="stream-img-wrapper" style="height: 400px;">
+                        <span class="tag-badge">8 Days Path</span>
+                        <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1200&q=80"
+                            alt="Mountain walking ridge">
+                    </div>
+                    <div class="stream-info-banner" style="width: 70%; bottom: -40px;">
+                        <h3>Sylvan Canopies & Forgotten Footholds</h3>
+                        <p>Trace ancient timber trails alongside localized botanical historians. Discover old-growth
+                            forest micro-dynamics safely.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pathfinder" id="pathfinder">
+        <div class="torn-divider-top"></div>
+        <div class="container">
+            <span class="section-tag" style="text-align: center; color: var(--muted-gold);">03 // Interactive
+                Simulation</span>
+            <h2>The Topology Selector</h2>
+            <p class="pathfinder-subtitle">Click across the topographic points to witness how slow travel re-architects
+                standard route coordinates.</p>
+
+            <div class="map-interactive-wrapper">
+                <div class="map-vector-frame">
+                    <svg class="map-svg-canvas">
+                        <path d="M 80 80 Q 200 300 180 250 T 380 120 T 480 300" fill="none"
+                            stroke="rgba(197,160,117,0.3)" stroke-width="2" stroke-dasharray="8,6" />
+                    </svg>
+
+                    <div class="map-node node-1 active" data-target="panel-1">01</div>
+                    <div class="map-node node-2" data-target="panel-2">02</div>
+                    <div class="map-node node-3" data-target="panel-3">03</div>
+                    <div class="map-node node-4" data-target="panel-4">04</div>
+                </div>
+
+                <div class="pathfinder-display-panel">
+                    <div class="panel-content panel-1 active">
+                        <h4>01 // Morning Thresholds</h4>
+                        <p>Instead of waking up at 5:00 AM to catch airport tour shuttles, watch fog burn off high
+                            pasture basins over local hand-roasted willow teas.</p>
+                    </div>
+                    <div class="panel-content panel-2">
+                        <h4>02 // Foraging Routes</h4>
+                        <p>Spend complete afternoons cataloging native edible fauna alongside village elders rather than
+                            peering down through glass tour buses.</p>
+                    </div>
+                    <div class="panel-content panel-3">
+                        <h4>03 // Uncharted Tracks</h4>
+                        <p>Step completely away from pre-paved concrete viewpoints. Walk along historic migratory
+                            pathways shaped purely by natural geography.</p>
+                    </div>
+                    <div class="panel-content panel-4">
+                        <h4>04 // Night Horizon Stills</h4>
+                        <p>Settle into local valley homestead structures where your evening schedule matches the slow
+                            natural patterns of the terrain.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="torn-divider-bottom"
+            style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,20 C1140,40 1080,10 1020,30 C960,50 900,20 840,40 C780,60 720,30 660,20 C600,10 540,50 480,40 C420,30 360,60 300,40 C240,20 180,50 120,30 C60,10 30,40 0,20 Z' fill='%23EFEAE2'/%3E%3C/svg%3E&quot;); transform: none;">
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <span class="section-tag" style="text-align: center;">04 // Wanderer Archives</span>
+            <h2>Voices From The Trail</h2>
+
+            <div class="staggered-track">
+                <div class="track-column">
+                    <div class="journal-card reveal">
+                        <p>"I lost track of time by morning three. We spent hours sitting by a riverbed watching
+                            shepherds guide their flocks. A complete internal reset."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+                                alt="Wanderer Elena">
+                            <div>
+                                <h5>Elena R. — Architectural Planner</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="journal-card reveal">
+                        <p>"OffMap doesn't shuttle you between gift shops. They introduce you to real, living
+                            ecosystems."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
+                                alt="Wanderer Marcus">
+                            <div>
+                                <h5>Marcus K. — Landscape Architect</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="track-column">
+                    <div class="journal-card reveal" style="transition-delay: 0.1s;">
+                        <p>"The lack of a strict timeline changed everything. When rain trapped us inside a tiny
+                            mountain farmhouse kitchen, it became the undisputed highlight of my year."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
+                                alt="Wanderer Devendra">
+                            <div>
+                                <h5>Devendra S. — Studio Designer</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="journal-card reveal" style="transition-delay: 0.1s;">
+                        <p>"Slowing down allowed us to actually see the landscape rather than just photographing it.
+                            Essential design for slow souls."</p>
+                        <div class="journal-meta">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80"
+                                alt="Wanderer Clara">
+                            <div>
+                                <h5>Clara M. — Research Novelist</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="planner">
+        <div class="torn-divider-top"
+            style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L1200,0 L1200,20 C1140,40 1080,10 1020,30 C960,50 900,20 840,40 C780,60 720,30 660,20 C600,10 540,50 480,40 C420,30 360,60 300,40 C240,20 180,50 120,30 C60,10 30,40 0,20 Z' fill='%231E2220'%3E%3C/path%3E%3C/svg%3E\"
+            );"></div>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-cta reveal">
+                    <h2>Ready to wander slower?</h2>
+                    <p>Leave your fast-paced schedule behind. Tell us the type of natural terrain landscape you're
+                        longing for, and let's craft a slow route.</p>
+                    <span class="scribble-text" style="color: var(--muted-gold);">* Routes map out seasonal
+                        shifts</span>
+                </div>
+
+                <div class="footer-form-wrapper reveal" style="transition-delay: 0.2s;">
+                    <form class="interactive-form"
+                        onsubmit="event.preventDefault(); alert('Coordinates received. A trail planner will reach out via slow signals soon.');">
+                        <div class="form-row">
+                            <input type="text" id="name" placeholder=" " required>
+                            <label for="name">Your Identity Name</label>
+                        </div>
+                        <div class="form-row">
+                            <input type="email" id="email" placeholder=" " required>
+                            <label for="email">Email Coordinates</label>
+                        </div>
+                        <div class="form-row">
+                            <select id="terrain" required style="color: var(--warm-cream); background: transparent;">
+                                <option value="" disabled selected hidden></option>
+                                <option value="alpine" style="background: var(--charcoal);">High Altitude Pasture Basins
+                                </option>
+                                <option value="woods" style="background: var(--charcoal);">Old Growth Sylvan Woodlands
+                                </option>
+                                <option value="dunes" style="background: var(--charcoal);">Silent Sand-Topography Dunes
+                                </option>
+                            </select>
+                            <label for="terrain"
+                                style="top: -0.8rem; font-size: 0.8rem; color: var(--muted-gold);">Desired
+                                Topography</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary"
+                            style="background-color: var(--sand-beige); color: var(--charcoal);">Initiate Drift</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>2026 OffMap Journeys. Built with intent.</p>
+                <ul class="socials">
+                    <li><a href="#">Journal Logs</a></li>
+                    <li><a href="https://www.instagram.com/bitsofeverywhere_">Instagram Moodboard</a></li>
+                    <li><a href="#">Footprint Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // 1. STICKY INTERACTIVE NAVBAR SCROLL MECHANICS
+            const navbar = document.querySelector(".navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 60) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // 2. HERO LAYER PARALLAX DRIFT (SMOOTH TRANSLATION FRAME)
+            const heroParallax = document.getElementById("hero-parallax");
+            window.addEventListener("scroll", () => {
+                const depth = window.pageYOffset;
+                heroParallax.style.transform = `translateY(${depth * 0.4}px) translateZ(0)`;
+            });
+
+            // 3. INTERACTIVE TOPOLOGY SELECTOR SWITCHING BEHAVIOR
+            const nodes = document.querySelectorAll(".map-node");
+            const panels = document.querySelectorAll(".panel-content");
+
+            nodes.forEach(node => {
+                node.addEventListener("click", () => {
+                    // Remove state from previous selections
+                    nodes.forEach(n => n.classList.remove("active"));
+                    panels.forEach(p => p.classList.remove("active"));
+
+                    // Activate targeted panels
+                    node.classList.add("active");
+                    const targetPanel = node.getAttribute("data-target");
+                    document.querySelector(`.${targetPanel}`).classList.add("active");
+                });
+            });
+
+            // 4. SCROLL INTERSECTION REVEAL CONTROLLER
+            const elementsToReveal = document.querySelectorAll(".reveal");
+            const observerConfiguration = {
+                threshold: 0.12,
+                rootMargin: "0px 0px -20px 0px"
+            };
+
+            const revealOnScrollObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerConfiguration);
+
+            elementsToReveal.forEach(element => revealOnScrollObserver.observe(element));
+        });
+    </script>
+</body>
+
+</html>

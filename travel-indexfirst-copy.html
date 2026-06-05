@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap | Travel slow, go Offmap!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ------------------------------------ */
+        /* 1. BRAND COLOR PALETTE & RESET       */
+        /* ------------------------------------ */
+        :root {
+            --forest-green: #2C4A3E;
+            --sand-beige: #F4EFEA;
+            --earthy-charcoal: #222222;
+            --off-white: #FAF8F5;
+            --muted-gold: #C2A67D;
+            --transition-smooth: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            background-color: var(--off-white);
+            color: var(--earthy-charcoal);
+            font-family: 'Montserrat', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ------------------------------------ */
+        /* 2. TYPOGRAPHY ARCHITECTURE           */
+        /* ------------------------------------ */
+        h1, h2, h3 {
+            font-family: 'Syncopate', sans-serif;
+            text-transform: uppercase;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-weight: 300;
+            line-height: 1.8;
+            color: rgba(34, 34, 34, 0.85);
+        }
+
+        /* ------------------------------------ */
+        /* 3. REUSABLE COMPONENTS & UTILITIES   */
+        /* ------------------------------------ */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background-color: var(--forest-green);
+            color: var(--off-white);
+        }
+
+        .btn-primary:hover {
+            background-color: transparent;
+            color: var(--forest-green);
+            border-color: var(--forest-green);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--off-white);
+            border-color: rgba(250, 248, 245, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--off-white);
+            color: var(--earthy-charcoal);
+            border-color: var(--off-white);
+        }
+
+        /* Scroll Reveal Base Class */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ------------------------------------ */
+        /* 4. NAVIGATION BAR (STICKY)          */
+        /* ------------------------------------ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 2rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            padding: 1.2rem 0;
+            background-color: rgba(250, 248, 245, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(44, 74, 62, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--off-white);
+            text-decoration: none;
+            letter-spacing: -1px;
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled .logo {
+            color: var(--forest-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--off-white);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled .nav-links a {
+            color: var(--earthy-charcoal);
+        }
+
+        .navbar.scrolled .nav-links a:hover {
+            color: var(--forest-green);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background-color: var(--off-white);
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled .menu-toggle span {
+            background-color: var(--earthy-charcoal);
+        }
+
+        /* ------------------------------------ */
+        /* 5. HERO SECTION (PARALLAX & SLOW)    */
+        /* ------------------------------------ */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--earthy-charcoal);
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%; /* Extra height for smooth parallax drift */
+            background: linear-gradient(to bottom, rgba(34,34,34,0.4), rgba(34,34,34,0.6)), 
+                        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            z-index: 1;
+            will-change: transform;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 750px;
+            color: var(--off-white);
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            animation: fadeInDown 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: rgba(250, 248, 245, 0.85);
+            margin-bottom: 3rem;
+            animation: fadeInUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.2s backwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.5rem;
+            animation: fadeInUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.4s backwards;
+        }
+
+        /* ------------------------------------ */
+        /* 6. ABOUT SECTION (EARTHY ASYMMETRY) */
+        /* ------------------------------------ */
+        .about {
+            padding: 10rem 0;
+            background-color: var(--sand-beige);
+            position: relative;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        .about-text-wrapper h2 {
+            font-size: 2.5rem;
+            color: var(--forest-green);
+            margin-bottom: 2.5rem;
+        }
+
+        .about-text-wrapper p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-text-wrapper p.highlight {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--forest-green);
+            border-left: 3px solid var(--forest-green);
+            padding-left: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        /* Elegant Imaged Layout mimicking offbeat trails */
+        .about-image-wrapper {
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .main-img-box {
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 30px 60px rgba(44, 74, 62, 0.15);
+        }
+
+        .main-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 2s ease;
+        }
+
+        .main-img-box:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Tiny floating secondary vignette for asymmetrical depth */
+        .secondary-img-box {
+            position: absolute;
+            bottom: -40px;
+            left: -60px;
+            width: 240px;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 8px solid var(--sand-beige);
+        }
+
+        .secondary-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ------------------------------------ */
+        /* 7. ANIMATIONS KEYS                  */
+        /* ------------------------------------ */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ------------------------------------ */
+        /* 8. RESPONSIVE MEDIA QUERIES          */
+        /* ------------------------------------ */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 2.5rem;
+            }
+
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 5rem;
+            }
+
+            .main-img-box {
+                height: 450px;
+            }
+
+            .secondary-img-box {
+                display: none; /* Simplifies layout seamlessly on tablets */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100vh;
+                background-color: var(--forest-green);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2.5rem;
+                transition: var(--transition-smooth);
+                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                color: var(--off-white);
+                font-size: 1.1rem;
+            }
+
+            .navbar.scrolled .nav-links a {
+                color: var(--off-white);
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .navbar.scrolled .menu-toggle.active span {
+                background-color: var(--off-white);
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .about {
+                padding: 6rem 0;
+            }
+
+            .about-text-wrapper h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">OffMap</a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">Destinations</a></li>
+                <li><a href="#about">Our Philosophy</a></li>
+                <li><a href="#">Journeys</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-bg" id="hero-parallax"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Travel slow, go Offmap!</h1>
+                <p>OffMap is for people who want to travel slower. To hike without rushing, sit with a view longer, and experience places deeply. We explore every location ourselves before taking you there.</p>
+                <div class="hero-actions">
+                    <a href="#" class="btn btn-primary">Explore Destinations</a>
+                    <a href="#" class="btn btn-secondary">Plan Your Trip</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text-wrapper reveal">
+                    <h2>We don’t make trips around sightseeing</h2>
+                    <p class="highlight">We curate journeys around experiencing places you’re visiting. <br>No Itineraries Just Flow & Slow Travel.</p>
+                    <p>Travel shouldn’t feel rushed. That’s why we do it differently.</p>
+                    <p>We spend more time in fewer places, connect with locals, and discover experiences before creating trips.</p>
+                </div>
+                <div class="about-image-wrapper reveal" style="transition-delay: 0.2s;">
+                    <div class="main-img-box">
+                        <img data-src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" alt="Remote green valley trails" class="lazy-img">
+                    </div>
+                    <div class="secondary-img-box">
+                        <img data-src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=600&q=80" alt="Hiker reflecting looking at mountains" class="lazy-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. MOBILE INTERACTION SYSTEM
+            const mobileMenu = document.getElementById("mobile-menu");
+            const navLinks = document.querySelector(".nav-links");
+
+            mobileMenu.addEventListener("click", () => {
+                mobileMenu.classList.toggle("active");
+                navLinks.classList.toggle("active");
+            });
+
+            // Close mobile menu when link clicked
+            document.querySelectorAll(".nav-links a").forEach(link => {
+                link.addEventListener("click", () => {
+                    mobileMenu.classList.remove("active");
+                    navLinks.classList.remove("active");
+                });
+            });
+
+            // 2. STICKY NAVBAR CONTROLLER
+            const navbar = document.querySelector(".navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            // 3. PERFORMANCE PARALLAX EFFECT FOR HERO
+            const heroBackground = document.getElementById("hero-parallax");
+            window.addEventListener("scroll", () => {
+                let offset = window.pageYOffset;
+                // Subtle factor alteration for effortless drifting
+                heroBackground.style.transform = `translateY(${offset * 0.4}px)`;
+            });
+
+            // 4. SCROLL REVEAL (INTERSECTION OBSERVER API)
+            const revealElements = document.querySelectorAll(".reveal");
+            const revealOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target); // Reveal once
+                    }
+                });
+            }, revealOptions);
+
+            revealElements.forEach(element => {
+                revealObserver.observe(element);
+            });
+
+            // 5. NATIVE PERFORMANCE LAZY LOADING IMAGES
+            const lazyImages = document.querySelectorAll(".lazy-img");
+            const imageOptions = {
+                threshold: 0,
+                rootMargin: "0px 0px 300px 0px"
+            };
+
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.getAttribute("data-src");
+                        img.onload = () => img.removeAttribute("data-src");
+                        observer.unobserve(img);
+                    }
+                });
+            }, imageOptions);
+
+            lazyImages.forEach(image => {
+                imageObserver.observe(image);
+            });
+        });
+    </script>
+</body>
+</html>
+
