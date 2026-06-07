@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap Travel | Slow Down & Go Off-Grid</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- DESIGN CORE SYSTEM --- */
+        :root {
+            --yellow: #FFDE2F;
+            --blue: #134E86;
+            --dark-blue: #0A192F;
+            --white: #FFFFFF;
+            --bg-canvas: #070B11;
+            --panel-bg: #0F172A;
+            --text-main: #F8FAFC;
+            --text-muted: rgba(248, 250, 252, 0.6);
+            --font-display: 'Syne', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --container-max: 1300px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* --- STICKY NAVIGATION BAR --- */
+        .navbar-core {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(7, 11, 17, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-line);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+        }
+
+        .nav-logo img {
+            height: 75px;
+            width: auto;
+        }
+
+        .nav-links-cluster {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .nav-link-item {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link-item:hover, .nav-link-item.active {
+            color: var(--yellow);
+        }
+
+        .nav-cta-btn {
+            background-color: transparent;
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-cta-btn:hover {
+            background-color: var(--yellow);
+            color: var(--bg-canvas);
+            transform: translateY(-2px);
+        }
+
+        /* --- GLOBAL LAYOUT CONTAINERS --- */
+        .section-wrapper {
+            width: 100%;
+            padding: 120px 4% 100px 4%;
+            border-bottom: 1px solid var(--border-line);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .section-inner {
+            width: 100%;
+            max-width: var(--container-max);
+        }
+
+        /* --- GLOBAL BUTTON STYLES --- */
+        .action-capsule {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--white);
+            background: transparent;
+            border: 1px solid var(--border-line);
+            padding: 16px 36px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .action-capsule:hover {
+            border-color: var(--yellow);
+            color: var(--bg-canvas);
+            background-color: var(--yellow);
+            transform: translateY(-3px);
+        }
+
+        .action-capsule.solid-accent {
+            background-color: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .action-capsule.solid-accent:hover {
+            background-color: var(--white);
+            border-color: var(--white);
+            color: var(--bg-canvas);
+        }
+
+        /* --- SECTION 1: HERO CONTAINER (VERTICAL LANDING) --- */
+        .hero-viewport {
+            min-height: 100vh;
+            padding-top: 140px;
+            background: linear-gradient(180deg, #070B11 0%, #0D1625 100%);
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-split-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-narrative-block {
+            max-width: 700px;
+        }
+
+        .hero-badge-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-line);
+            padding: 8px 18px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+        }
+
+        .badge-pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--yellow);
+            border-radius: 50%;
+        }
+
+        .badge-label-text {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .hero-headline-massive {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 5.5vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .hero-headline-massive span {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--white);
+        }
+
+        .hero-subtext-para {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .hero-interactive-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Scrapbook Cluster Visual Elements */
+        .hero-media-scrapbook {
+            position: relative;
+            width: 100%;
+            height: 480px;
+        }
+
+        /* .scrapbook-layer {
+            position: absolute;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease;
+        } */
+
+        .scrapbook-layer{
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+}
+
+.hero-ambient-video{
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transform: scale(1.05);
+    filter: contrast(1.05) brightness(0.85) saturate(1.1);
+    border:17px solid white;
+    border-radius:29px;
+}
+
+.hero-ambient-video2{
+    width: 100%;
+    height: 315px;
+    object-fit: cover;
+    transform: scale(1.05);
+    filter: contrast(1.05) brightness(0.85) saturate(1.1);
+    /* border:17px solid white; */
+    border-radius:29px;
+}
+
+
+.hero-ambient-video3{
+    width: 100%;
+    height: 315px;
+    object-fit: cover;
+    transform: scale(1.05);
+    filter: contrast(1.05) brightness(0.85) saturate(1.1);
+    /* border:17px solid white; */
+    border-radius:29px;
+    background-color:  rgb(255 222 47);
+    padding: 2px;
+}
+
+
+
+/* soft film overlay */
+.scrapbook-layer::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.05)
+    );
+    pointer-events: none;
+}
+
+.layer-caption-bar{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(8px);
+}
+
+        .scrapbook-layer:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            z-index: 20 !important;
+        }
+
+        .layer-primary {
+            width: 444px;
+            /* top: 20px; */
+            left: 40px;
+            transform: rotate(-1deg);
+            z-index: 5;
+            right:10px;
+        }
+
+        .layer-secondary {
+            width: 361px;
+            bottom: 20px;
+            right: 10px;
+            transform: rotate(6deg);
+            border-color: var(--blue);
+            z-index: 10;
+        }
+
+        .scrapbook-layer img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            border:8px solid white;
+            border-radius:14px;
+        }
+
+        .layer-caption-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 0.7rem;
+            font-family: var(--font-display);
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* --- SECTION 2: BRAND MANIFESTO --- */
+        .manifesto-viewport {
+            background-color: #090F19;
+        }
+
+        .manifesto-split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: flex-start;
+        }
+
+        .sticky-title-column h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            text-transform: uppercase;
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        .sticky-title-column h2 em {
+            font-style: normal;
+            color: var(--yellow);
+        }
+
+        .manifesto-content-column {
+            background: rgb(255 222 47);
+            border: 1px solid var(--border-line);
+            border-radius: 24px;
+            padding: 12px;
+        }
+
+        .manifesto-lead-text {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: var(--white);
+            margin-bottom: 40px;
+        }
+
+        .polarity-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .polarity-row-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 30px;
+            border-left: 4px solid var(--border-line);
+        }
+
+        .polarity-row-card.highlight-blue {
+            border-left-color: var(--blue);
+        }
+
+        .polarity-row-card.highlight-yellow {
+            border-left-color: var(--yellow);
+        }
+
+        .polarity-row-card h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .polarity-row-card.highlight-yellow h4 { color: var(--yellow); }
+        .polarity-row-card.highlight-blue h4 { color: rgba(255,255,255,0.9); }
+
+        .polarity-row-card ul {
+            list-style: none;
+        }
+
+        .polarity-row-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .polarity-row-card ul li::before {
+            content: "→";
+            color: var(--blue);
+            font-weight: bold;
+        }
+
+        /* --- SECTION 3: MAP DISCOVERY CONSOLE --- */
+        .radar-viewport {
+            background-color: #060A10;
+        }
+
+        .radar-section-header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .radar-section-header h2 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .radar-section-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .radar-console-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        /* .radar-viewscreen-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-line);
+            border-radius: 24px;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 450px;
+        } */
+
+        /* .radar-viewscreen-box{
+            height: 520px;
+            border-radius: 18px;
+            overflow: hidden;
+        } */
+
+        #radarMap{
+            height: 500px;
+            width: 100%;
+            border-radius:10px;
+        }
+
+        .hud-watermark {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .vector-map-blueprint {
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+        }
+
+        .map-interactive-polygon {
+            fill: rgba(255, 255, 255, 0.02);
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 1.5;
+            stroke-dasharray: 6 4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-interactive-polygon:hover, .map-interactive-polygon.is-active {
+            fill: rgba(19, 78, 134, 0.3);
+            stroke: var(--yellow);
+            stroke-dasharray: 0;
+        }
+
+        .radar-city-node { cursor: pointer; }
+        .radar-city-node text {
+            font-family: var(--font-display);
+            font-size: 11px;
+            fill: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .radar-city-node:hover text, .radar-city-node.is-active text { fill: var(--yellow); }
+
+        .radar-data-output-panel {
+                width:100%;
+                min-width:0;   /* IMPORTANT */
+                overflow:hidden;
+        }
+
+        .output-panel-header {
+            /* border-bottom: 1px solid var(--border-line); */
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .output-panel-header h3 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        /* .slotted-cards-vertical-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        } */
+
+        .slotted-cards-vertical-wrapper{
+            display:flex;
+            flex-direction:row;
+            gap:18px;
+
+            overflow-x:auto;
+            overflow-y:hidden;
+
+            width:100%;
+            max-width:100%;
+
+            scroll-behavior:smooth;
+            scrollbar-width:none;
+            animation: scrollGallery 25s linear infinite;
+        }
+
+        .slotted-cards-vertical-wrapper::-webkit-scrollbar{
+            display:none;
+        }
+
+        .slotted-cards-vertical-wrapper::-webkit-scrollbar-thumb{
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+        }
+
+        /* .slotted-destination-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .slotted-destination-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .slotted-destination-card img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+        } */
+
+        
+        .slotted-destination-card{
+    min-width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
+
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-line);
+    border-radius: 16px;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+     flex:0 0 260px;
+    transition: transform 0.3s ease;
+}
+
+.slotted-destination-card:hover{
+    transform: translateY(-5px);
+}
+   .video-gallery{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    width:100%;
+}
+
+.video-gallery video{
+    flex:0 0 260px;
+    height:420px;
+    object-fit:cover;
+    border-radius:20px;
+}    
+.slotted-destination-card img{
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 0;
+}
+.slotted-card-contents{
+    padding: 18px;
+}
+        .slotted-card-contents h5 {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .slotted-card-contents p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* --- SECTION 4: FRAMEWORK ARCHITECTURE (TABS CONSOLE) --- */
+        .framework-viewport {
+            background-color: #0A111C;
+        }
+
+        .framework-header-area {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .framework-header-area h2 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .framework-tab-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .framework-tab-trigger {
+            background: transparent;
+            border: 1px solid var(--border-line);
+            color: var(--white);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .framework-tab-trigger.is-active, .framework-tab-trigger:hover {
+            background-color: var(--white);
+            color: var(--bg-canvas);
+            border-color: var(--white);
+            font-weight: 600;
+        }
+
+        .framework-pane-display {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-line);
+            border-radius: 24px;
+            padding: 45px;
+            display: none;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .framework-pane-display.is-visible {
+            display: grid;
+        }
+
+        .pane-text-content h3 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: var(--yellow);
+        }
+
+        .pane-text-content p {
+            font-size: 1.05rem;
+            line-height: 1.65;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .pane-image-housing img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 3px solid var(--border-line);
+            background: rgb(255 222 47);
+        }
+
+        /* --- SECTION 5: SEQUENCER --- */
+        .sequence-viewport {
+            background-color: #0a111c;
+        }
+
+        .sequence-headline-centered {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .sequence-headline-centered h2 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            text-transform: uppercase;
+        }
+
+        .sequence-vertical-chain {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .sequence-vertical-chain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 35px;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--blue) 0%, var(--border-line) 80%, transparent 100%);
+        }
+
+        .sequence-chain-node {
+            display: flex;
+            gap: 40px;
+            position: relative;
+        }
+
+        .node-numeric-badge {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-line);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--yellow);
+            flex-shrink: 0;
+            z-index: 5;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .node-description-body {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 25px 35px;
+            width: 100%;
+        }
+
+        .node-description-body h4 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .node-description-body p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        /* --- SECTION 6: INTAKE CORE CONSOLE --- */
+        .intake-viewport {
+            background: linear-gradient(135deg, #070b11 0%, #070b11 100%);
+            padding-bottom: 60px;
+        }
+
+        .intake-layout-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 70px;
+            align-items: center;
+        }
+
+        .intake-editorial-narrative h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+
+        .intake-editorial-narrative p {
+            font-size: 1.1rem;
+            line-height: 1.65;
+            color: var(--text-muted);
+        }
+
+        .intake-housing-panel{
+            position:relative;
+            overflow:hidden;
+            border-radius:24px;
+            padding:40px;
+        }
+
+       .panel-video-bg{
+            position:absolute;
+            inset:0;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+
+            z-index:1;
+        }
+
+        .intake-housing-panel::before{
+            content:"";
+            position:absolute;
+            inset:0;
+
+            background:rgba(0,0,0,.65);
+
+            z-index:2;
+        }
+
+        .intake-housing-panel form,
+    .intake-housing-panel footer{
+        position:relative;
+        z-index:3;
+    }
+
+
+        .input-group-stack {
+            margin-bottom: 25px;
+        }
+
+        .input-group-stack label {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color:#fff;
+            margin-bottom: 12px;
+            font-weight: 700;
+             text-shadow:0 2px 8px rgba(0,0,0,.8);
+        }
+
+        .chip-options-wrapper {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chip-toggle-node {
+            background: transparent;
+            border: 1px solid var(--border-line);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .chip-toggle-node.is-selected {
+            background-color: var(--white);
+            color: var(--bg-canvas);
+            border-color: var(--white);
+            font-weight: 700;
+        }
+
+        .text-input-node {
+            width: 100%;
+            background:rgba(0,0,0,.45);
+            backdrop-filter:blur(8px);
+            border:1px solid rgba(255,255,255,.2);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--white);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input-node:focus {
+            border-color: var(--yellow);
+            outline: none;
+        }
+
+        .console-submit-action {
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--yellow);
+            color: var(--bg-canvas);
+            font-family: var(--font-display);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .console-submit-action:hover {
+            background-color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* --- INTEGRATED PRETTY FOOTER --- */
+        .footer-terminal {
+            width: 100%;
+            max-width: var(--container-max);
+            margin: 25px auto 0 auto;
+            /* border-top: 1px solid var(--border-line); */
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- VISUAL COLOR ACCENT STRIP --- */
+        .asymmetric-color-ribbon {
+            width: 100%;
+            height: 5px;
+            display: flex;
+        }
+        .ribbon-cell { flex: 1; height: 100%; }
+        .cell-1 { background-color: #0056B3; }
+        .cell-2 { background-color: var(--yellow); }
+        .cell-3 { background-color: #FFFFFF; }
+        .cell-4 { background-color: var(--blue); }
+
+        /* --- MODERN MOBILE RESPONSIVENESS --- */
+        @media (max-width: 1024px) {
+            .hero-split-grid, .manifesto-split-layout, .radar-console-grid, .framework-pane-display, .intake-layout-grid {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+            .hero-media-scrapbook {
+                height: 360px;
+                max-width: 450px;
+                margin: 0 auto;
+            }
+            .nav-links-cluster {
+                display: none; /* Can expand to hamburger menu if required */
+            }
+            .framework-pane-display {
+                display: block;
+            }
+            .pane-image-housing {
+                margin-top: 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .section-wrapper {
+                padding: 80px 4% 60px 4%;
+            }
+            .hero-headline-massive {
+                font-size: 2.6rem;
+            }
+            .node-numeric-badge {
+                width: 50px;
+                height: 50px;
+                font-size: 0.95rem;
+            }
+            .sequence-vertical-chain::before {
+                left: 25px;
+            }
+            .footer-terminal {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+
+/* css for horizontal scrolling video srtat */
+
+#targetConsoleDisplayPortal{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-behavior:smooth;
+    padding-bottom:10px;
+}
+
+#targetConsoleDisplayPortal::-webkit-scrollbar{
+    height:6px;
+}
+
+#targetConsoleDisplayPortal::-webkit-scrollbar-thumb{
+    background:#FFDE2F;
+    border-radius:20px;
+}
+
+.video-card{
+    flex:0 0 280px;
+    height:420px;
+    border-radius:18px;
+    overflow:hidden;
+    position:relative;
+}
+
+.video-card video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.video-marquee{
+    width:100%;
+    overflow:hidden;
+    position:relative;
+}
+
+.video-track{
+    display:flex;
+    gap:20px;
+    width:max-content;
+
+    animation: scrollVideos 25s linear infinite;
+}
+
+.video-track video{
+    width:260px;
+    height:420px;
+    object-fit:cover;
+    border-radius:20px;
+    flex-shrink:0;
+}
+
+@keyframes scrollVideos{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(calc(-50%));
+    }
+}
+.video-track:hover{
+    animation-play-state:paused;
+}
+/* end */
+
+.layer-tertiary{
+    position:absolute;
+    width:180px;
+    top:20px;
+    right:20px;
+    transform:rotate(-8deg);
+    z-index:15;
+}
+
+.hero-ambient-video-small{
+    width:100%;
+    height:240px;
+    object-fit:cover;
+    border:10px solid white;
+    border-radius:18px;
+}
+.layer-primary{
+    width:340px;
+    left:20px;
+    top:40px;
+}
+
+.layer-secondary{
+    width:250px;
+    right:0;
+    bottom:0;
+}
+
+.layer-tertiary{
+    width:309px;
+    right:-47px;
+    top:198px;
+    z-index:20;
+}
+
+
+.social-icons{
+    display:flex;
+    gap:12px;
+    margin-top:2rem;
+    color:var(--yellow);
+}
+
+.social-icons a{
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.15);
+    color:var(--parchment-sand);
+    transition:.3s;
+    text-decoration: none;
+}
+
+.social-icons a:hover{
+    background:var(--yellow-green);
+    color:var(--deep-forest);
+}
+
+
+
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar-core">
+        <div class="nav-logo">
+            <img src="https://komalsbabar.github.io/traveleee-offmap/img/logo.png" alt="OffMap White Logo">
+        </div>
+        <div class="nav-links-cluster">
+            <a href="#horizon" class="nav-link-item active">Horizon</a>
+            <a href="#manifesto" class="nav-link-item">Manifesto</a>
+            <a href="#radar" class="nav-link-item">Scout Radar</a>
+            <a href="#frameworks" class="nav-link-item">Frameworks</a>
+            <a href="#sequence" class="nav-link-item">Sequence</a>
+        </div>
+        <a href="#intake" class="nav-cta-btn">Plan An Escape</a>
+    </nav>
+
+    <header id="horizon" class="section-wrapper hero-viewport">
+        <div class="section-inner">
+            <div class="hero-split-grid">
+                <div class="hero-narrative-block">
+                    <div class="hero-badge-row">
+                        <div class="badge-pulse-dot"></div>
+                        <span class="badge-label-text">Slow Travel Blueprint</span>
+                    </div>
+                    <h1 class="hero-headline-massive">Travel slow,<br><span>go Offmap!</span></h1>
+                    <p class="hero-subtext-para">OffMap is for people who want to travel slower. To hike without rushing, sit with a view longer, and experience places deeply. We explore every single location ourselves before taking you there.</p>
+                    <div class="hero-interactive-buttons">
+                        <a href="#radar" class="action-capsule solid-accent">Explore Destinations</a>
+                        <a href="#intake" class="action-capsule">Plan Your Trip</a>
+                    </div>
+                </div>
+                
+                <div class="hero-media-scrapbook">
+                    <div class="scrapbook-layer layer-primary">
+                        <!-- <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=cover&w=500&q=80" alt="Mountain View Complex"> -->
+                          <video class="hero-ambient-video" autoplay loop muted playsinline>
+                            <source src="v5.mp4" type="video/mp4">
+                        </video>
+                        <!-- <div class="layer-caption-bar">
+                            <span>SURVEY ELEMENT // 01</span>
+                            <span>32.27° N</span>
+                        </div> -->
+                    </div>
+                    <div class="scrapbook-layer layer-secondary">
+                        <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=cover&w=400&q=80" alt="Scouted Trails">
+                        <!-- <div class="layer-caption-bar">
+                            <span>LOCAL FIELD TRACE</span>
+                            <span>77.06° E</span>
+                        </div> -->
+                    </div>
+                    <div class="scrapbook-layer layer-tertiary">
+                        <video class="hero-ambient-video-small" autoplay loop muted playsinline>
+                            <source src="v2.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="manifesto" class="section-wrapper manifesto-viewport">
+        <div class="section-inner">
+            <div class="manifesto-split-layout">
+                
+                <div class="manifesto-content-column">
+                    <!-- <p class="manifesto-lead-text">No hard timelines. Just un-rushed community loops and natural immersion. Travel shouldn’t feel like a checklist execution task.</p> -->
+                    
+                    <div class="polarity-stack">
+                        <!-- <div class="polarity-row-card highlight-yellow"> -->
+                            <!-- <h4>The Slow Paradigm</h4>
+                            <ul>
+                                <li>Deep experiential anchoring within regional homes</li>
+                                <li>Venturing cleanly off computational route maps</li>
+                                <li>All-inclusive 3-4 days curated micro-escapes</li>
+                                <li>Funneling resources directly into local mountain economies</li>
+                            </ul> -->
+
+                             <video class="hero-ambient-video2" autoplay loop muted playsinline>
+                                <source src="v5.mp4" type="video/mp4">
+                            </video>
+                            
+                        <!-- </div> -->
+                        <!-- <div class="polarity-row-card highlight-blue">
+                            <h4>The Generic Grid</h4>
+                            <ul>
+                                <li>Rushing through heavily congested tourist zones</li>
+                                <li>Zero structural space to absorb ancestral contexts</li>
+                                <li>Surface observations isolated behind transit glass</li>
+                            </ul>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="sticky-title-column">
+                    <h2 class="mb-5">We don’t make trips around sightseeing, we curate <em>journeys.</em></h2>
+                    <!-- <p class="manifesto-lead-text mt-5">No hard timelines. Just un-rushed community loops and natural immersion. Travel shouldn’t feel like a checklist execution task.</p> -->
+                    
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="radar" class="section-wrapper radar-viewport">
+        <div class="section-inner">
+            <div class="radar-section-header">
+                <span style="    color: var(--yellow);
+    letter-spacing: 4px;
+    font-size: 12px;
+    text-transform: uppercase;">SUB HEADING</span>
+                <h2>Operational Scout Radar</h2>
+                <p>Select a highlighted area inside our core active sectors to check curated routes</p>
+            </div>
+
+            <div class="radar-console-grid">
+               <div id="radarMap" class="radar-viewscreen-box"></div>
+
+                <div class="radar-data-output-panel">
+                    <div class="output-panel-header">
+                        <h3 id="targetConsoleTitle">Rajasthan Field</h3>
+                    </div>
+                    <div class="slotted-cards-vertical-wrapper" id="targetConsoleDisplayPortal">
+                        <div class="slotted-destination-card">
+                            <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=200&q=80" alt="Desert Tracks">
+                            <div class="slotted-card-contents">
+                                <h5>Desert Drift</h5>
+                                <p>Unmapped stargazing trails across completely quiet, isolated dunes away from tourist crowds.</p>
+                            </div>
+                        </div>
+                        <div class="slotted-destination-card">
+                            <img src="https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=200&q=80" alt="Aravali Trails">
+                            <div class="slotted-card-contents">
+                                <h5>Aravali Manor</h5>
+                                <p>Dwell inside local family fortsteads structured around organic harvest cycles and local music.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="frameworks" class="section-wrapper framework-viewport">
+        <div class="section-inner">
+            <div class="framework-header-area">
+                <span    style="color: var(--yellow);
+    letter-spacing: 4px;
+    font-size: 12px;
+    text-transform: uppercase";>SUB HEADING</span>
+                <h2>Tailored Escapes</h2>
+            </div>
+            
+            <div class="framework-tab-bar">
+                <button class="framework-tab-trigger is-active" onclick="activateFrameworkTab('group', this)">Group Tracks</button>
+                <button class="framework-tab-trigger" onclick="activateFrameworkTab('custom', this)">Solo</button>
+                <button class="framework-tab-trigger" onclick="activateFrameworkTab('stays', this)">Slow Homestays</button>
+                <button class="framework-tab-trigger" onclick="activateFrameworkTab('corporate', this)">Corporate & School</button>
+            </div>
+
+            <div class="framework-pane-display is-visible" id="pane-group">
+                <div class="pane-text-content">
+                    <h3>Group Travel Tracks</h3>
+                    <p>Join small, vetted clusters of independent minded travelers leaving directly from Delhi checkpoints. These public tracks combine solo freedom with curated native experiences, managed completely by our regional field scouts.</p>
+                    <a href="#intake" class="action-capsule">Request Group Slots</a>
+                </div>
+                <div class="pane-image-housing">
+                    <!-- <img src="https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=cover&w=600&q=80" alt="Group Exploration"> -->
+                    <video class="hero-ambient-video3" autoplay loop muted playsinline>
+                                <source src="v2.mp4" type="video/mp4">
+                            </video>
+                
+                </div>
+            </div>
+
+            <div class="framework-pane-display" id="pane-custom">
+                <div class="pane-text-content">
+                    <h3>Solo</h3>
+                    <p>Tell us your timeline parameters, and we balance your specific path down to precision detail. Perfect for couples, groups of friends, or families looking for completely customized departure setups with verified local drivers.</p>
+                    <a href="#intake" class="action-capsule">Request Solo Slots</a>
+                </div>
+                <div class="pane-image-housing">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=cover&w=600&q=80" alt="Custom Paths">
+                </div>
+            </div>
+
+            <div class="framework-pane-display" id="pane-stays">
+                <div class="pane-text-content">
+                    <h3>Slow Homestays</h3>
+                    <p>Ditch moving tracks altogether. Stay fixed inside native stone houses in Himachal or legacy properties in Rajasthan for multiple weeks. Complete remote work infrastructure meets high-altitude clean spaces.</p>
+                    <a href="#intake" class="action-capsule">Browse Stays</a>
+                </div>
+                <div class="pane-image-housing">
+                    <!-- <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=600&q=80" alt="Slow Living Spaces"> -->
+                    <video class="hero-ambient-video3" autoplay loop muted playsinline>
+                                <source src="v4.mp4" type="video/mp4">
+                            </video>
+                </div>
+            </div>
+
+            <div class="framework-pane-display" id="pane-corporate">
+                <div class="pane-text-content">
+                    <h3>Corporate & School Resets</h3>
+                    <p>Decompress from corporate sprint loops or organize experimental learning excursions for students. We swap stale presentation halls with immersive field tracing, mapping exercises, and baseline community immersion programs.</p>
+                    <a href="#intake" class="action-capsule">Inquire Corporate Packages</a>
+                </div>
+                <div class="pane-image-housing">
+                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=cover&w=600&q=80" alt="Team Outings">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    
+    <!-- <section id="sequence" class="section-wrapper sequence-viewport">
+        <div class="section-inner">
+            <div class="sequence-headline-centered">
+                <h2>Booking Sequence</h2>
+            </div>
+
+            <div class="sequence-vertical-chain">
+                <div class="sequence-chain-node">
+                    <div class="node-numeric-badge">01</div>
+                    <div class="node-description-body">
+                        <h4>Direct WhatsApp Sync</h4>
+                        <p>No complex client dashboards. Tap our request matrix to establish secure encryption text channels directly with our target field operators.</p>
+                    </div>
+                </div>
+                <div class="sequence-chain-node">
+                    <div class="node-numeric-badge">02</div>
+                    <div class="node-description-body">
+                        <h4>Itinerary Blueprint Reveal</h4>
+                        <p>Receive your custom visual mapping schematic displaying unhurried trail routes, regional food points, and local home stays.</p>
+                    </div>
+                </div>
+                <div class="sequence-chain-node">
+                    <div class="node-numeric-badge">03</div>
+                    <div class="node-description-body">
+                        <h4>30% Security Hold Lock</h4>
+                        <p>Confirm allocation access with a simple 30% slot assurance payment. Rest of the financial volume is handled upon field arrival.</p>
+                    </div>
+                </div>
+                <div class="sequence-chain-node">
+                    <div class="node-numeric-badge">04</div>
+                    <div class="node-description-body">
+                        <h4>Delhi Assembly Departure</h4>
+                        <p>Our organized slow travel clusters aggregate at verified hubs within Delhi before pushing cleanly into the target mountains or plains.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+
+
+<style>
+     /* ---------------------------------------------------------------- */
+        /* MASONRY GALLERY HARVEST (Fresh & Cool Visual Array)             */
+        /* ---------------------------------------------------------------- */
+        .gallery-section { padding: 12rem 0; background-color: var(--warm-cream); position: relative; }
+        .gallery-header { text-align: center; margin-bottom: 6rem; }
+        .gallery-header h2 { font-size: clamp(2.8rem, 6vw, 4.5rem); }
+        
+        .gallery-masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 240px;
+            gap: 2rem;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            transition: var(--transition-smooth);
+            border:2px solid #ffde2f;
+
+        }
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: var(--transition-smooth);
+        }
+        .gallery-overlay-card {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(43,62,45,0.85), transparent);
+            display: flex; align-items: flex-end; padding: 2rem;
+            opacity: 0; transition: var(--transition-smooth);
+        }
+        .gallery-overlay-card h4 { color: var(--warm-cream); font-size: 1.8rem; transform: translateY(20px); transition: var(--transition-smooth); }
+        
+        .gallery-item:hover { transform: translateY(-8px); box-shadow: 0 25px 45px rgba(43,62,45,0.2); }
+        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-item:hover .gallery-overlay-card { opacity: 1; }
+        .gallery-item:hover .gallery-overlay-card h4 { transform: translateY(0); }
+
+        /* Asymmetric Masonry Row-Span Modules */
+        .g-span-2h { grid-row: span 2; }
+        .g-span-2w { grid-column: span 2; }
+        .g-span-2w2h { grid-column: span 2; grid-row: span 2; }
+
+        @media (max-width: 992px) {
+            .gallery-masonry-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; }
+            .g-span-2w2h { grid-column: span 2; grid-row: span 2; }
+        }
+        @media (max-width: 576px) {
+            .gallery-masonry-grid { grid-template-columns: 1fr; grid-auto-rows: 250px; }
+            .gallery-item { grid-column: auto !important; grid-row: auto !important; }
+        }
+
+</style>
+
+<section id="gallery" class="section-wrapper section-gallery">
+    <div class="section-inner">
+
+        <div class="journey-header">
+            <span>gallery</span>
+            <h2>Visual Records From The OffMap</h2>
+        </div>
+          <div class="gallery-masonry-grid">
+                <div class="gallery-item g-span-2w2h reveal">
+                     <video class="" autoplay loop muted playsinline>
+                                <source src="v5.mp4" type="video/mp4">
+                    </video>
+                    <div class="gallery-overlay-card">
+                        <h4>Ridge Paths</h4>
+                    </div>
+                </div>
+                <div class="gallery-item g-span-2h reveal">
+                  <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=800&q=80" alt="High ridges explorer">
+                    
+                    
+                    
+                    <div class="gallery-overlay-card">
+                        <h4>Misty Woodlands</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="img/k2.PNG?auto=format&fit=crop&w=500&q=80" alt="Glacial river drift">
+                    <div class="gallery-overlay-card">
+                        <h4>River Runs</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="img/j1.PNG?auto=format&fit=crop&w=500&q=80" alt="Distant high plateau outpost">
+                    <div class="gallery-overlay-card">
+                        <h4>Outposts</h4>
+                    </div>
+                </div>
+                <div class="gallery-item g-span-2w reveal">
+                    <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80" alt="Altiplano green meadows sunset valleys">
+                    <div class="gallery-overlay-card">
+                        <h4>Sunset Valleys</h4>
+                    </div>
+                </div>
+                <div class="gallery-item g-span-2w reveal">
+                    <!-- <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80" alt="Altiplano green meadows sunset valleys"> -->
+                    
+                    <video class="hero-ambient-video3" autoplay loop muted playsinline>
+                                <source src="v4.mp4" type="video/mp4">
+                    </video>
+                    
+                    <div class="gallery-overlay-card">
+                        <h4>Sunset Valleys</h4>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</section>
+
+
+    <style>
+        .journey-header{
+    text-align:center;
+    margin-bottom:100px;
+}
+
+.journey-header span{
+    color:var(--yellow);
+    letter-spacing:4px;
+    font-size:12px;
+    text-transform:uppercase;
+}
+
+.journey-header h2{
+    font-family:var(--font-display);
+    font-size:4rem;
+    margin-top:15px;
+}
+
+.journey-route{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    width:100%;
+}
+
+.journey-stop{
+    width:220px;
+    text-align:center;
+    position:relative;
+}
+
+.stop-dot{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:#FFDE2F;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    color:#134E86;
+    box-shadow:0 10px 30px rgba(255,222,47,.25);
+}
+
+.stop-dot i{
+    line-height:1;
+}
+
+.journey-stop h4{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+.journey-stop p{
+    color:var(--text-muted);
+    font-size:14px;
+}
+
+.route-line{
+    flex:1;
+    height:2px;
+    background:
+    linear-gradient(
+        90deg,
+        var(--yellow),
+        rgba(255,255,255,.15)
+    );
+    margin-bottom:80px;
+}
+    </style>
+
+<section id="sequence" class="section-wrapper sequence-viewport">
+    <div class="section-inner">
+
+        <div class="journey-header">
+            <span>HOW IT WORKS</span>
+            <h2>Your Journey Begins Before You Travel</h2>
+        </div>
+
+        <div class="journey-route">
+
+            <div class="journey-stop">
+                <div class="stop-dot"><i class="fa-brands fa-whatsapp"></i></div>
+                <h4>Message Us</h4>
+                <p>Tell us where you want to disappear.</p>
+            </div>
+
+            <div class="route-line"></div>
+
+            <div class="journey-stop">
+                <div class="stop-dot">    <i class="fa-solid fa-map"></i></div>
+                <h4>Blueprint</h4>
+                <p>We craft your custom route.</p>
+            </div>
+
+            <div class="route-line"></div>
+
+            <div class="journey-stop">
+                <div class="stop-dot"> <i class="fa-solid fa-credit-card"></i></div>
+                <h4>Confirm</h4>
+                <p>Reserve your slot with a deposit.</p>
+            </div>
+
+            <div class="route-line"></div>
+
+            <div class="journey-stop">
+                <div class="stop-dot"><i class="fa-solid fa-mountain-sun"></i></div>
+                <h4>Departure</h4>
+                <p>Meet the crew and leave the grid.</p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+    <section id="intake" class="section-wrapper intake-viewport">
+        <div class="section-inner">
+            <div class="intake-layout-grid">
+                <div class="intake-editorial-narrative">
+                    <h2>Step out clean onto new horizons.</h2>
+                    <p>Coordinate group itineraries, secure custom remote stays, or execute corporate resets cleanly. Our regional framework is optimized from departure down onto final trails.</p>
+                 <div class="social-icons">
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-whatsapp"></i></a>
+                </div>
+                </div>
+
+                <div class="intake-housing-panel">
+                   
+                    <form>
+                    <div class="input-group-stack">
+                        <label>Operational Framework</label>
+                        <div class="chip-options-wrapper" id="formFrameworkCluster">
+                            <button class="chip-toggle-node is-selected" onclick="toggleFormChip('framework', this)">Group Tracks</button>
+                            <button class="chip-toggle-node" onclick="toggleFormChip('framework', this)">Solo</button>
+                            <button class="chip-toggle-node" onclick="toggleFormChip('framework', this)">Slow Homestays</button>
+                            <button class="chip-toggle-node" onclick="toggleFormChip('framework', this)">Corporate / School</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group-stack">
+                        <label>Primary Field Zone</label>
+                        <div class="chip-options-wrapper" id="formTerrainCluster">
+                            <button class="chip-toggle-node is-selected" onclick="toggleFormChip('terrain', this)">Himachal Valleys</button>
+                            <button class="chip-toggle-node" onclick="toggleFormChip('terrain', this)">Rajasthan Plains</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group-stack">
+                        <label>Whatsapp Number</label>
+                        <input type="text" id="formNotesElement" class="text-input-node" placeholder="+919090909098">
+                    </div>
+
+                    <div class="input-group-stack">
+                        <label>Escape Notes & Goals</label>
+                        <input type="text" id="formNotesElement" class="text-input-node" placeholder="Tell us your timeline vision or focus intent...">
+                    </div>
+
+                    <button class="console-submit-action" onclick="transmitPayloadToWhatsApp()">Request Configuration Build</button>
+                    </form>
+                    <video class="panel-video-bg" autoplay muted loop playsinline>
+                        <source src="v6.mp4" type="video/mp4">
+                    </video>
+                   
+                </div>
+            </div>
+        </div>
+    </section>
+ <footer class="footer-terminal">
+                        <span>© 2026 OffMap Designed and developed by Komal Babar</span>
+                        <span>Preserving raw local rhythm fields.</span>
+                    </footer>
+    <div class="asymmetric-color-ribbon">
+        <div class="ribbon-cell cell-1"></div>
+        <div class="ribbon-cell cell-2"></div>
+        <div class="ribbon-cell cell-3"></div>
+        <div class="ribbon-cell cell-4"></div>
+    </div>
+
+    <script>
+      
+
+        // Framework Content Switch Tabs Engine
+        function activateFrameworkTab(paneKey, triggerButton) {
+            const parentBlock = triggerButton.parentElement;
+            parentBlock.querySelectorAll('.framework-tab-trigger').forEach(btn => btn.classList.remove('is-active'));
+            triggerButton.classList.add('is-active');
+
+            document.querySelectorAll('.framework-pane-display').forEach(pane => pane.classList.remove('is-visible'));
+            document.getElementById(`pane-${paneKey}`).classList.add('is-visible');
+        }
+
+        // Intake Form Individual Selection Node Toggle
+        function toggleFormChip(scope, element) {
+            const wrap = element.parentElement;
+            wrap.querySelectorAll('.chip-toggle-node').forEach(chip => chip.classList.remove('is-selected'));
+            element.classList.add('is-selected');
+        }
+
+        // Transmit Final Client Bundle String directly into API endpoints
+        function transmitPayloadToWhatsApp() {
+            let activeFramework = "";
+            let activeTerrain = "";
+            
+            document.querySelectorAll('#formFrameworkCluster .chip-toggle-node').forEach(c => {
+                if(c.classList.contains('is-selected')) activeFramework = c.innerText;
+            });
+            document.querySelectorAll('#formTerrainCluster .chip-toggle-node').forEach(c => {
+                if(c.classList.contains('is-selected')) activeTerrain = c.innerText;
+            });
+
+            const specificIntentInput = document.getElementById('formNotesElement').value || "Requesting spatial slow itinerary overview.";
+            const structuredQueryString = `Hello OffMap Team!\n\nI want to look into an escape configuration:\nFramework Style: ${activeFramework}\nTarget Sector: ${activeTerrain}\nOverview Goals: ${specificIntentInput}`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=919999999999&text=${encodeURIComponent(structuredQueryString)}`, '_blank');
+        }
+
+        // Dynamic Active State Highlighter for Scrolling
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('header, section');
+            const navLinks = document.querySelectorAll('.nav-link-item');
+            
+            let currentActiveId = "";
+            sections.forEach(sec => {
+                const sectionTop = sec.offsetTop;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    currentActiveId = sec.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentActiveId}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+const scoutMatrix = {
+    rajasthan: {
+        headline: "Rajasthan Field",
+        items: [
+            {
+                name: "Desert Drift",
+                desc: "Unmapped stargazing trails across quiet dunes away from tourist chaos.",
+                img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=200&q=80"
+            },
+            {
+                name: "Aravali Manor",
+                desc: "Ancient family stays rooted in slow harvest cycles & folk rhythm.",
+                img: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=200&q=80"
+            }
+        ]
+    },
+
+    himachal: {
+        headline: "Himachal Field",
+        items: [
+            // {
+            //     name: "Spiti Core Lines",
+            //     desc: "High altitude stone villages built for silence & slow observation.",
+            //     img: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=cover&w=200&q=80"
+            // },
+            // {
+            //     name: "Tirthan Hideaway",
+            //     desc: "Forest river walks with no schedule — just terrain flow.",
+            //     img: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=cover&w=200&q=80"
+            // },
+             { video: "v4.mp4" },
+        { video: "v2.mp4" },
+        { video: "v4.mp4" },
+        { video: "v2.mp4" }
+        ]
+    }
+};
+
+// 📍 Coordinates
+const delhi = [28.6139, 77.2090];
+const rajasthan = [27.0238, 74.2179];
+const himachal = [31.1048, 77.1734];
+
+// 🗺️ MAP INIT
+const map = L.map('radarMap', {
+    zoomControl: false
+}).setView([28.2, 75.5], 5);
+
+// base layer (ONLY ONCE)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+}).addTo(map);
+
+// markers
+const markerRajasthan = L.marker(rajasthan).addTo(map);
+const markerHimachal = L.marker(himachal).addTo(map);
+
+// routes
+const routeRajasthan = L.polyline([delhi, rajasthan], {
+    color: "#FFDE2F",
+    weight: 4
+}).addTo(map);
+
+const routeHimachal = L.polyline([delhi, himachal], {
+    color: "#2E86FF",
+    weight: 4
+}).addTo(map);
+
+// 🧠 render right panel
+// function renderRadarConsole(key){
+//     const data = scoutMatrix[key];
+
+//     document.getElementById('targetConsoleTitle').innerText = data.headline;
+
+//     document.getElementById('targetConsoleDisplayPortal').innerHTML =
+//         data.items.map(item => `
+//             <div class="slotted-destination-card">
+//                 <img src="${item.img}" alt="${item.name}">
+//                 <div class="slotted-card-contents">
+//                     <h5>${item.name}</h5>
+//                     <p>${item.desc}</p>
+//                 </div>
+//             </div>
+//         `).join('');
+// }
+
+function renderRadarConsole(key){
+
+    const data = scoutMatrix[key];
+
+    document.getElementById('targetConsoleTitle').innerText =
+        data.headline;
+
+    let html = "";
+
+    data.items.forEach(item => {
+
+        html += `
+            <div class="video-card">
+                <video autoplay muted loop playsinline>
+                    <source src="${item.video}" type="video/mp4">
+                </video>
+            </div>
+        `;
+    });
+
+    document.getElementById('targetConsoleDisplayPortal').innerHTML = html;
+}
+
+// clicks
+markerRajasthan.on('click', () => renderRadarConsole('rajasthan'));
+markerHimachal.on('click', () => renderRadarConsole('himachal'));
+
+// default load
+window.addEventListener('load', () => {
+    renderRadarConsole('rajasthan');
+    map.setView(rajasthan, 6);
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+});
+function autoScrollGallery(){
+
+    const gallery =
+        document.getElementById("targetConsoleDisplayPortal");
+
+    let speed = 1;
+
+    setInterval(() => {
+
+        gallery.scrollLeft += speed;
+
+        if(
+            gallery.scrollLeft >=
+            gallery.scrollWidth - gallery.clientWidth
+        ){
+            gallery.scrollLeft = 0;
+        }
+
+    },20);
+}
+
+window.onload = () => {
+    renderRadarConsole('himachal');
+    autoScrollGallery();
+};
+</script>
+</body>
+</html>

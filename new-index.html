@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap | Travel Slow, Go Offmap!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+   <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   <style>
+        /* --- BRAND DESIGN MATRIX --- */
+        :root {
+            --yellow: #FFDE2F;
+            --blue: #134E86;
+            --white: #FFFFFF;
+            --bg-light: #F9F9F6;
+            --dark: #0F1A24;
+            --font-display: 'Syne', sans-serif;
+            --font-ui: 'Space Grotesk', sans-serif;
+            --font-hand: 'Caveat', cursive;
+        }
+
+        /* --- CSS RESET & BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--bg-light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* --- ANIMATED PRAYER FLAGS OVERLAY --- */
+        .prayer-flags-container {
+            width: 100%;
+            height: 45px;
+            overflow: hidden;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            z-index: 20;
+            display: flex;
+            white-space: nowrap;
+        }
+
+        .prayer-string {
+            display: flex;
+            animation: flagSway 6s ease-in-out infinite alternate;
+        }
+
+        .flag {
+            width: 40px;
+            height: 35px;
+            margin-right: 4px;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%);
+            display: inline-block;
+        }
+
+        .flag:nth-child(5n+1) { background-color: #0066b2; } /* Blue */
+        .flag:nth-child(5n+2) { background-color: var(--yellow); } /* Yellow */
+        .flag:nth-child(5n+3) { background-color: #FFFFFF; border: 1px solid #ddd; } /* White */
+        .flag:nth-child(5n+4) { background-color: #009a44; } /* Green */
+        .flag:nth-child(5n+5) { background-color: #d11919; } /* Red */
+
+        @keyframes flagSway {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(4px) rotate(2deg); }
+        }
+
+        /* --- STICKY NAVIGATION --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4%;
+            z-index: 100;
+            border-bottom: 2px solid var(--dark);
+        }
+
+        .logo-container img {
+            height: 80px;
+            display: block;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--blue);
+        }
+
+        .nav-cta {
+            background-color: var(--yellow);
+            padding: 10px 22px;
+            border: 2px solid var(--dark);
+            border-radius: 4px;
+            box-shadow: 3px 3px 0px var(--dark);
+            transition: all 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--dark);
+        }
+
+        /* --- UTILITY BUTTONS --- */
+        .btn-primary {
+            font-family: var(--font-ui);
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 16px 32px;
+            background-color: var(--yellow);
+            color: var(--dark);
+            border: 3px solid var(--dark);
+            border-radius: 4px;
+            box-shadow: 5px 5px 0px var(--dark);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-primary:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 9px 9px 0px var(--dark);
+        }
+
+        .btn-secondary {
+            font-family: var(--font-ui);
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 16px 32px;
+            background-color: transparent;
+            color: var(--white);
+            border: 3px solid var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--white);
+            color: var(--dark);
+        }
+
+        /* --- SECTION 1: THE YJHD HORIZON BANNER --- */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            padding-top: 80px;
+            background-color: var(--bg-light);
+        }
+
+        .hero-left {
+            flex: 1.2;
+            padding: 5% 5% 5% 5%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-headline {
+            font-family: var(--font-display);
+            font-size: clamp(3.2rem, 6vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            color: var(--dark);
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .hero-subtext {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: rgba(15, 26, 36, 0.85);
+            max-width: 520px;
+            margin-bottom: 40px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Floating Postcard Badges */
+        .postcard-badge {
+            position: absolute;
+            background: var(--white);
+            border: 2px solid var(--dark);
+            padding: 12px;
+            box-shadow: 4px 4px 0px var(--dark);
+            transform: rotate(-6deg);
+            width: 140px;
+            bottom: 8%;
+            right: 8%;
+            z-index: 5;
+        }
+
+        .postcard-badge img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+            margin-bottom: 6px;
+        }
+
+        .postcard-badge p {
+            font-family: var(--font-hand);
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--blue);
+        }
+
+        .hero-right {
+            flex: 1;
+            position: relative;
+            background-color: var(--blue);
+            overflow: hidden;
+            border-left: 3px solid var(--dark);
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+
+        .video-overlay-text {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            color: var(--white);
+            z-index: 10;
+        }
+
+        .video-overlay-text h4 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .video-overlay-text p {
+            font-family: var(--font-hand);
+            font-size: 1.5rem;
+            color: var(--yellow);
+        }
+
+        /* --- SECTION 2: THE ANTI-SIGHTSEEING MANIFESTO --- */
+        .manifesto-section {
+            padding: 100px 6%;
+            background-color: var(--blue);
+            color: var(--white);
+            border-top: 3px solid var(--dark);
+            border-bottom: 3px solid var(--dark);
+            position: relative;
+        }
+
+        .manifesto-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2s 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .manifesto-text-block h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2.2rem, 4vw, 3.8rem);
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 30px;
+        }
+
+        .manifesto-text-block p {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        /* Dynamic Flow vs Rush Toggle UI */
+        .toggle-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px var(--dark);
+        }
+
+        .toggle-switch-container {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--white);
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 25px;
+            font-family: var(--font-ui);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--yellow);
+            color: var(--dark);
+        }
+
+        .matrix-pane {
+            display: none;
+        }
+
+        .matrix-pane.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .matrix-pane h3 {
+            font-family: var(--font-display);
+            color: var(--yellow);
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .matrix-pane ul {
+            list-style: none;
+        }
+
+        .matrix-pane ul li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+            font-size: 1.05rem;
+        }
+
+        .matrix-pane ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--yellow);
+        }
+
+        /* --- SECTION 3: THE OFFBEAT MAP TRACKER --- */
+        .map-section {
+            padding: 100px 6%;
+            background-color: var(--bg-light);
+            text-align: center;
+        }
+
+        .section-header-bold {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            text-transform: uppercase;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .section-sub-hand {
+            font-family: var(--font-hand);
+            font-size: 1.8rem;
+            color: var(--blue);
+            margin-bottom: 50px;
+        }
+
+        .map-dashboard {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 50px;
+            background: var(--white);
+            border: 3px solid var(--dark);
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px var(--dark);
+            overflow: hidden;
+        }
+
+        /* Blueprint Hand-drawn Style Map Wrapper */
+        .map-vector-wrapper {
+            background-color: #eef3f7;
+            padding: 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 3px solid var(--dark);
+            background-image: radial-gradient(rgba(19, 78, 134, 0.15) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        .blueprint-map-svg {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+        }
+
+        /* Region Interaction */
+        .map-region-path {
+            fill: rgba(19, 78, 134, 0.1);
+            stroke: var(--blue);
+            stroke-width: 2.5;
+            stroke-dasharray: 6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-region-path:hover, .map-region-path.active {
+            fill: rgba(255, 222, 47, 0.4);
+            stroke-dasharray: 0;
+            stroke-width: 3.5;
+        }
+
+        .map-pin {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .map-pin:hover {
+            transform: scale(1.3);
+        }
+
+        /* Dynamic Cards Panel */
+        .map-cards-panel {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+            background: var(--white);
+        }
+
+        .region-title-display {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--dark);
+            padding-bottom: 10px;
+            color: var(--blue);
+        }
+
+        .trip-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .trip-card {
+            border: 2px solid var(--dark);
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--bg-light);
+            box-shadow: 4px 4px 0px var(--dark);
+            transition: transform 0.2s ease;
+        }
+
+        .trip-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--dark);
+        }
+
+        .trip-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--dark);
+        }
+
+        .trip-card-content {
+            padding: 15px;
+        }
+
+        .trip-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background-color: var(--yellow);
+            padding: 2px 8px;
+            border: 1px solid var(--dark);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .trip-card h5 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .trip-card p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* --- SECTION 4: THE 30% BLUEPRINT JOURNEY --- */
+        .blueprint-section {
+            padding: 100px 6%;
+            background-color: #F1F4F1;
+            border-top: 3px solid var(--dark);
+            border-bottom: 3px solid var(--dark);
+        }
+
+        .timeline-container {
+            max-width: 1100px;
+            margin: 50px auto 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            position: relative;
+        }
+
+        .timeline-card {
+            background: var(--white);
+            border: 2px solid var(--dark);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 5px 5px 0px var(--dark);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-num {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background: var(--yellow);
+            border: 2px solid var(--dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 2px 2px 0px var(--dark);
+        }
+
+        .timeline-card h4 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 12px;
+            color: var(--blue);
+        }
+
+        .timeline-card p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.85;
+        }
+
+        /* --- SECTION 5: VISUAL CAPTURES GALLERY --- */
+        .gallery-section {
+            padding: 100px 0;
+            background-color: var(--white);
+            overflow: hidden;
+        }
+
+        /* .gallery-track-container {
+            width: 100%;
+            padding: 30px 4%;
+            overflow-x: auto;
+        }
+
+        .gallery-track {
+            display: flex;
+            gap: 35px;
+            width: max-content;
+            padding-bottom: 20px;
+        } */
+
+        .gallery-track-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.gallery-track {
+    display: flex;
+    gap: 35px;
+    width: max-content;
+    animation: scrollGallery 25s linear infinite;
+}
+
+.gallery-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scrollGallery {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+        /* Polaroid Image Stack Concept */
+        .polaroid-frame {
+            background-color: var(--white);
+            border: 2px solid var(--dark);
+            padding: 16px 16px 35px 16px;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+            width: 280px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .polaroid-frame:nth-child(even) {
+            transform: rotate(3deg) translateY(10px);
+        }
+
+        .polaroid-frame:nth-child(odd) {
+            transform: rotate(-3deg);
+        }
+
+        .polaroid-frame:hover {
+            transform: rotate(0deg) scale(1.05) translateY(-10px);
+            box-shadow: 12px 12px 0px var(--dark);
+            z-index: 10;
+        }
+
+        .polaroid-frame img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .polaroid-caption {
+            font-family: var(--font-hand);
+            font-size: 1.5rem;
+            color: var(--dark);
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* --- SECTION 6: THE WHATSAPP CONSOLE FOOTER --- */
+        .footer-console {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 90px 6% 40px 6%;
+            border-top: 4px solid var(--dark);
+            position: relative;
+        }
+
+        .console-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 70px;
+            margin-bottom: 60px;
+        }
+
+        .console-info h3 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            color: var(--yellow);
+        }
+
+        .console-info p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Interactive Micro-Planner Module */
+        .planner-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 35px;
+        }
+
+        .planner-group {
+            margin-bottom: 20px;
+        }
+
+        .planner-group label {
+            display: block;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: var(--white);
+        }
+
+        .chip-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chip-btn {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            color: var(--white);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--font-ui);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .chip-btn.selected {
+            background-color: var(--yellow);
+            color: var(--dark);
+            border-color: var(--yellow);
+            font-weight: 700;
+        }
+
+        .input-custom {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.2);
+            padding: 14px;
+            color: var(--white);
+            font-family: var(--font-ui);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .input-custom:focus {
+            outline: none;
+            border-color: var(--yellow);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        /* --- ANIMATIONS & CORE RESPONSIVENESS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section { flex-direction: column; }
+            .hero-right { min-height: 400px; border-left: none; border-top: 3px solid var(--dark); }
+            .manifesto-container { grid-template-columns: 1fr; }
+            .map-dashboard { grid-template-columns: 1fr; }
+            .map-vector-wrapper { border-right: none; border-bottom: 3px solid var(--dark); }
+            .timeline-container { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
+            .console-container { grid-template-columns: 1fr; gap: 40px; }
+        }
+
+        @media (max-width: 600px) {
+            .timeline-container { grid-template-columns: 1fr; gap: 40px; }
+            .trip-cards-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Kept clean and minimal for mobile flow */
+        }
+
+        .flow-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.flow-text {
+    flex: 1;
+}
+
+.flow-image {
+    flex: 1;
+    text-align: center;
+}
+
+.flow-image video {
+    max-width: 100%;
+    height: 280px;
+    border-radius: 10px;
+    border: 2px solid white;
+    border-top: transparent;
+    border-left: transparent;
+}
+
+@media (max-width: 768px) {
+    .flow-content-wrapper {
+        flex-direction: column;
+    }
+
+    .flow-image {
+        margin-top: 20px;
+    }
+}
+
+#offmap-leaflet-map {
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.map-vector-wrapper {
+    width: 100%;
+}
+
+/* rajasthan cards */
+.cards-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.slider-arrows{
+    display:flex;
+    gap:10px;
+}
+
+.slider-arrows button{
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:18px;
+    background:#134E86;
+    color:#fff;
+}
+
+.trip-slider-wrapper{
+    overflow:hidden;
+}
+
+.trip-slider{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    scroll-behavior:smooth;
+}
+
+.trip-card{
+    flex:0 0 calc(50% - 10px);
+}
+
+.trip-slider::-webkit-scrollbar{
+    display:none;
+}
+
+/* .trip-card{
+    min-width:280px;
+    flex-shrink:0;
+} */
+.social-icons{
+    display:flex;
+    gap:12px;
+    margin-top:2rem;
+    color:var(--yellow);
+}
+
+.social-icons a{
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.15);
+    color:var(--parchment-sand);
+    transition:.3s;
+    text-decoration: none;
+}
+
+.social-icons a:hover{
+    background:var(--yellow-green);
+    color:var(--deep-forest);
+}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo-container">
+            <img src="https://komalsbabar.github.io/traveleee-offmap/img/logo.png" alt="OffMap Logo">
+        </a>
+        <div class="nav-links">
+            <a href="#manifesto">Philosophy</a>
+            <a href="#destinations">Destinations</a>
+            <a href="#process">How It Works</a>
+            <a href="#gallery">Captures</a>
+            <a href="#planner" class="nav-cta">Plan Custom</a>
+        </div>
+    </nav>
+
+    <div class="prayer-flags-container">
+        <div class="prayer-string">
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+            <span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span><span class="flag"></span>
+        
+        
+        
+        </div>
+    </div>
+
+    <header class="hero-section">
+        <div class="hero-left">
+            <h1 class="hero-headline">Travel slow,<br>go Offmap!</h1>
+            <p class="hero-subtext">OffMap is for people who want to travel slower. To hike without rushing, sit with a view longer, and experience places deeply. We explore every location ourselves before taking you there.</p>
+            <div class="hero-ctas">
+                <a href="#destinations" class="btn-primary">Explore Destinations</a>
+                <a href="#planner" class="btn-primary" style="background-color: var(--white);">Plan Your Trip</a>
+            </div>
+            <div class="postcard-badge">
+                <img src="img/j.PNG?auto=format&fit=cover&w=400&q=80" alt="Scout log">
+                <p>Rajasthan 📍</p>
+            </div>
+        </div>
+        <div class="hero-right">
+            <video class="hero-video" autoplay loop muted playsinline>
+                <source src="v4.mp4" type="video/mp4">
+            </video>
+            <div class="video-overlay-text">
+                <h4>Chasing Light</h4>
+                <p>Somewhere in Himachal...</p>
+            </div>
+        </header>
+
+    <section class="manifesto-section" id="manifesto">
+        <div class="manifesto-container">
+            <div class="manifesto-text-block">
+                <h2>We don’t make trips around sightseeing.</h2>
+                <p>We curate journeys around experiencing places you’re visiting. No Itineraries, Just Flow & Slow Travel.</p>
+                <p>Travel shouldn’t feel rushed. That’s why we do it differently. We spend more time in fewer places, connect with locals, and discover raw experiences ourselves before bringing you there.</p>
+            </div>
+            <div class="toggle-box">
+                <div class="toggle-switch-container">
+                    <button class="toggle-btn active" onclick="switchMatrix('flow')">The Flow</button>
+                    <button class="toggle-btn" onclick="switchMatrix('rush')">The Rush</button>
+                </div>
+                <div id="flow-pane" class="matrix-pane active">
+                    <div class="flow-content-wrapper">
+
+                        <!-- Left Content -->
+                        <div class="flow-text">
+                            <h3>How OffMap Travels:</h3>
+                            <ul>
+                                <li>Deep local interactions over rushed monument ticking</li>
+                                <li>Unlocking remote valleys and pristine secret trails</li>
+                                <li>Spontaneous slow community living & cultural integration</li>
+                                <li>Boosting local regional economies transparently</li>
+                            </ul>
+                        </div>
+
+                        <!-- Right Image -->
+                        <div class="flow-image">
+                            <!-- <img src="images/offmap-travel.jpg" alt="OffMap Travel"> -->
+                            <video class="hero-video" autoplay loop muted playsinline>
+                                <source src="v5.mp4" type="video/mp4">
+                            </video> 
+                        </div>
+
+                    </div>
+                </div>
+                <div id="rush-pane" class="matrix-pane">
+                    <div class="flow-content-wrapper">
+                        <!-- Left Content -->
+                        <div class="flow-text">
+                        <h3>Traditional Sightseeing:</h3>
+                        <ul>
+                            <li>48-hour packed checklists leaving you exhausted</li>
+                            <li>Packed tourist traps with zero room to breathe</li>
+                            <li>Surface level interaction viewed from a bus window</li>
+                            <li>Mass commercial footprints that disregard local culture</li>
+                        </ul>
+                        </div>
+
+                         <!-- Right Image -->
+                        <div class="flow-image">
+                            <!-- <img src="images/offmap-travel.jpg" alt="OffMap Travel"> -->
+                            <video class="hero-video" autoplay loop muted playsinline>
+                                <source src="v1.mp4" type="video/mp4">
+                            </video> 
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="map-section" id="destinations">
+        <h2 class="section-header-bold">Our Home Turf</h2>
+        <p class="section-sub-hand">Click on a region to track our scouted routes</p>
+
+        <div class="map-dashboard">
+            <div class="map-vector-wrapper">
+                  <div id="offmap-leaflet-map"></div>
+            </div>
+
+            <!-- <div class="map-cards-panel">
+                <h3 id="region-title" class="region-title-display">Rajasthan Gems</h3>
+                <div class="trip-cards-grid" id="trips-container">
+                    <div class="trip-card">
+                        <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=400&q=80" alt="Jaisalmer">
+                        <div class="trip-card-content">
+                            <span class="trip-tag">Group Trip</span>
+                            <h5>Desert Drift</h5>
+                            <p>Stargazing in non-commercial dunes, slow pottery workshops.</p>
+                        </div>
+                    </div>
+                    <div class="trip-card">
+                        <img src="https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=400&q=80" alt="Pushkar stays">
+                        <div class="trip-card-content">
+                            <span class="trip-tag">Stays</span>
+                            <h5>The Aravali Farm</h5>
+                            <p>An ancient stone cottage tucked entirely away from the city crowds.</p>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="map-cards-panel">
+
+    <div class="cards-header">
+        <h3 id="region-title" class="region-title-display">Rajasthan Gems</h3>
+
+        <div class="slider-arrows">
+            <button onclick="slideTrips(-1)">❮</button>
+            <button onclick="slideTrips(1)">❯</button>
+        </div>
+    </div>
+
+    <div class="trip-slider-wrapper">
+        <div class="trip-slider" id="trips-container">
+        </div>
+    </div>
+
+</div>
+
+        </div>
+    </section>
+
+    <section class="blueprint-section" id="process">
+        <center>
+            <h2 class="section-header-bold">The Blueprint Route</h2>
+            <p class="section-sub-hand">Simple, clean operations from start to finish</p>
+        </center>
+        
+        <div class="timeline-container">
+            <div class="timeline-card">
+                <div class="step-num">1</div>
+                <h4>WhatsApp Hello</h4>
+                <p>Skip complex booking setups. Tap link, send us a text, and strike up a chat with the team who personally scouted the valley.</p>
+            </div>
+            <div class="timeline-card">
+                <div class="step-num">2</div>
+                <h4>Blueprint Drop</h4>
+                <p>We share our custom un-hurried travel blueprint detailing secret trail markers, local hosts, and flow structures.</p>
+            </div>
+            <div class="timeline-card">
+                <div class="step-num">3</div>
+                <h4>30% Lock In</h4>
+                <p>Secure your slot instantly by completing a 30% deposit payment. Clear the remainder comfortably right before the journey begins.</p>
+            </div>
+            <div class="timeline-card">
+                <div class="step-num">4</div>
+                <h4>Delhi Gathering</h4>
+                <p>All slow-travel groups unite at our designated hub in Delhi, loading up and setting out together toward remote gems.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-section" id="gallery">
+        <center>
+            <h2 class="section-header-bold">Visual Journal</h2>
+            <p class="section-sub-hand">Real communities, raw memories, un-rushed travel</p>
+        </center>
+
+        <div class="gallery-track-container">
+            <div class="gallery-track">
+                <div class="polaroid-frame">
+                    <img src="img/k.PNG" alt="Girls on trip">
+                    <div class="polaroid-caption">Valleys laughing ✨</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="img/insta2.png" alt="Group moments">
+                    <div class="polaroid-caption">No itineraries. Flow.</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="img/k2.PNG" alt="Rajasthan local">
+                    <div class="polaroid-caption">Stories by the fire</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="img/k3.PNG" alt="Himachal pass">
+                    <div class="polaroid-caption">Sitting longer with views</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="img/j2.PNG?auto=format&fit=cover&w=400&q=80" alt="Local stay meals">
+                    <div class="polaroid-caption">Organic community tables</div>
+                </div>
+                 <div class="polaroid-frame">
+                    <img src="img/k4.PNG?auto=format&fit=cover&w=400&q=80" alt="Rajasthan local">
+                    <div class="polaroid-caption">Stories by the fire</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=cover&w=400&q=80" alt="Himachal pass">
+                    <div class="polaroid-caption">Sitting longer with views</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="img/j.PNG" alt="Local stay meals">
+                    <div class="polaroid-caption">Organic community tables</div>
+                </div>
+                 <div class="polaroid-frame">
+                    <img src="img/j1.PNG" alt="Rajasthan local">
+                    <div class="polaroid-caption">Stories by the fire</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=cover&w=400&q=80" alt="Himachal pass">
+                    <div class="polaroid-caption">Sitting longer with views</div>
+                </div>
+                <div class="polaroid-frame">
+                    <img src="https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=cover&w=400&q=80" alt="Local stay meals">
+                    <div class="polaroid-caption">Organic community tables</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-console" id="planner">
+        <div class="console-container">
+            <div class="console-info">
+                <h3>Let's step OffMap.</h3>
+                <p>We map out group journeys, customized solo escapes, schools/corporate breaks, and long-term homestay arrangements across hidden corners of India.</p>
+                <p style="color: var(--yellow); font-family: var(--font-hand); font-size: 1.8rem; transform: rotate(-2deg);">Starts straight from Delhi!</p>
+             <div class="social-icons">
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/offmap.in/"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            
+            <div class="planner-card">
+                <div class="planner-group">
+                    <label>Select Vibe</label>
+                    <div class="chip-container" id="vibe-container">
+                        <button class="chip-btn selected" onclick="selectChip('vibe', this)">Group Trip</button>
+                        <button class="chip-btn" onclick="selectChip('vibe', this)">Customized</button>
+                        <button class="chip-btn" onclick="selectChip('vibe', this)">Stays</button>
+                        <button class="chip-btn" onclick="selectChip('vibe', this)">Corporate/School</button>
+                    </div>
+                </div>
+                
+                <div class="planner-group">
+                    <label>Target Canvas</label>
+                    <div class="chip-container" id="canvas-container">
+                        <button class="chip-btn selected" onclick="selectChip('canvas', this)">Himachal Valleys</button>
+                        <button class="chip-btn" onclick="selectChip('canvas', this)">Rajasthan Dunes</button>
+                    </div>
+                </div>
+
+                <div class="planner-group">
+                    <label>Your Name / Notes</label>
+                    <input type="text" id="traveler-name" class="input-custom" placeholder="Hey OffMap, I want to explore...">
+                </div>
+                <div class="planner-group">
+                    <label>Whatsapp Number</label>
+                    <input type="text" id="traveler-name" class="input-custom" placeholder="+919090909099">
+                </div>
+
+                <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="dispatchWhatsApp()">
+                    Request Journey Blueprint
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 OffMap Travel. Preserving remote gems responsibly.</p>
+            <p>Designed By Komal Babar.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Store for Map Interaction
+        const regionData = {
+            rajasthan: {
+                title: "Rajasthan Gems",
+                trips: [
+                    { tag: "Group Trip", title: "Desert Drift", desc: "Stargazing in non-commercial dunes, slow pottery workshops.", img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=400&q=80" },
+                    { tag: "Stays", title: "The Aravali Farm", desc: "An ancient stone cottage tucked entirely away from the city crowds.", img: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=400&q=80" },
+                     { tag: "Group Trip", title: "Desert Drift", desc: "Stargazing in non-commercial dunes, slow pottery workshops.", img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=400&q=80" },
+                    { tag: "Stays", title: "The Aravali Farm", desc: "An ancient stone cottage tucked entirely away from the city crowds.", img: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=400&q=80" }
+              
+                ]
+            },
+            himachal: {
+                title: "Himachal Pockets",
+                trips: [
+                    { tag: "Group Trip", title: "Spiti Secret Lines", desc: "7 days spending deep time inside zero-network traditional homestays.", img: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=cover&w=400&q=80" },
+                    { tag: "Customized", title: "Tirthan Trails", desc: "Hike without rushing through old pine woodlands and pristine riverbanks.", img: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=cover&w=400&q=80" },
+                    { tag: "Group Trip", title: "Spiti Secret Lines", desc: "7 days spending deep time inside zero-network traditional homestays.", img: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=cover&w=400&q=80" },
+                    { tag: "Customized", title: "Tirthan Trails", desc: "Hike without rushing through old pine woodlands and pristine riverbanks.", img: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=cover&w=400&q=80" }
+                
+                
+                ]
+            }
+        };
+
+        // Switch Logic for Anti-Sightseeing Matrix Toggle
+        function switchMatrix(type) {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.matrix-pane').forEach(pane => pane.classList.remove('active'));
+            
+            if(type === 'flow') {
+                event.target.classList.add('active');
+                document.getElementById('flow-pane').classList.add('active');
+            } else {
+                event.target.classList.add('active');
+                document.getElementById('rush-pane').classList.add('active');
+            }
+        }
+
+        // Region Switcher Engine for Map Tracker
+        function showRegion(regionKey) {
+
+            const data = regionData[regionKey];
+
+            document.getElementById('region-title').innerText = data.title;
+
+            let htmlContent = '';
+
+            data.trips.forEach(trip => {
+                htmlContent += `
+                    <div class="trip-card" style="animation: fadeIn 0.4s ease forwards;">
+                        <img src="${trip.img}" alt="${trip.title}">
+                        <div class="trip-card-content">
+                            <span class="trip-tag">${trip.tag}</span>
+                            <h5>${trip.title}</h5>
+                            <p>${trip.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+           const slider = document.getElementById('trips-container');
+            slider.innerHTML = htmlContent;
+            slider.scrollLeft = 0;
+        }
+
+        function slideTrips(direction){
+
+    const slider = document.getElementById('trips-container');
+
+    slider.scrollBy({
+        left: direction * 320,
+        behavior: 'smooth'
+    });
+
+}
+
+        // Micro-Planner Option Selections
+        function selectChip(group, button) {
+            const container = button.parentElement;
+            container.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+            button.classList.add('selected');
+        }
+
+        // Dynamic WhatsApp API Form Forwarder
+        function dispatchWhatsApp() {
+            let activeVibe = "";
+            let activeCanvas = "";
+            
+            document.querySelectorAll('#vibe-container .chip-btn').forEach(b => {
+                if(b.classList.contains('selected')) activeVibe = b.innerText;
+            });
+            document.querySelectorAll('#canvas-container .chip-btn').forEach(b => {
+                if(b.classList.contains('selected')) activeCanvas = b.innerText;
+            });
+            
+            const customNotes = document.getElementById('traveler-name').value || "Slow Travel Journey Plan";
+            
+            const baseText = `Hey OffMap Team! I am planning an escape.\n\nType: ${activeVibe}\nRegion: ${activeCanvas}\nDetails/Name: ${customNotes}`;
+            const encodedText = encodeURIComponent(baseText);
+            
+            // Fires off directly to official WhatsApp business router API
+            window.open(`https://api.whatsapp.com/send?phone=919999999999&text=${encodedText}`, '_blank');
+        }
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    var map = L.map('offmap-leaflet-map').setView([23.5937, 78.9629], 5);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var himachalMarker = L.marker([31.1048, 77.1734])
+        .addTo(map)
+        .bindPopup('<b>Himachal Pradesh</b>');
+
+    himachalMarker.on('click', function () {
+        showRegion('himachal');
+    });
+
+    var rajasthanMarker = L.marker([26.9124, 75.7873])
+        .addTo(map)
+        .bindPopup('<b>Rajasthan</b>');
+
+    rajasthanMarker.on('click', function () {
+        showRegion('rajasthan');
+    });
+
+    // default cards
+    showRegion('rajasthan');
+
+});
+</script>
+</body>
+</html>

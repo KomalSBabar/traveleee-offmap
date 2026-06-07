@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OffMap | Travel Slow, Go Offmap!</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandYellow: '#FFDE2F',
+            brandBlue: '#134E86',
+            brandDark: '#0B1D33',
+            brandLight: '#FAF9F5'
+          },
+          fontFamily: {
+            display: ['Clash Display', 'sans-serif'],
+            body: ['General Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'General Sans', sans-serif;
+      background-color: #FAF9F5;
+      overflow-x: hidden;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF9F5;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #134E86;
+      border-radius: 4px;
+    }
+
+    /* Custom Kinetic Grid Background */
+    .blueprint-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(19, 78, 134, 0.04) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(19, 78, 134, 0.04) 1px, transparent 1px);
+    }
+
+    /* Fluid horizontal gallery hides scrollbars natively */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Custom Custom Cursor Link Interaction */
+    .custom-cursor {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #134E86;
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      transition: width 0.3s, height 0.3s, background-color 0.3s;
+    }
+    
+    .custom-cursor.hovered {
+      width: 50px;
+      height: 50px;
+      background-color: rgba(255, 222, 47, 0.3);
+      border-color: #FFDE2F;
+    }
+
+    /* Scrapbook Postcard tilt animation defaults */
+    .postcard-tilt-left {
+      transform: rotate(-3deg);
+    }
+    .postcard-tilt-right {
+      transform: rotate(4deg);
+    }
+  </style>
+</head>
+<body class="blueprint-bg text-brandDark selection:bg-brandYellow selection:text-brandBlue">
+
+  <div class="custom-cursor hidden md:block" id="cursor"></div>
+
+  <nav class="fixed top-0 left-0 w-full z-50 px-6 py-4 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto flex items-center justify-between bg-brandLight/80 backdrop-blur-md border-2 border-brandBlue/20 px-6 py-3 rounded-full shadow-sm">
+      
+        <div class="w-8 h-8  flex items-center justify-between  transform group-hover:rotate-12 transition-transform">
+             <a href="#" class="logo-block flex justify-center group">
+                <img src="img/logo.png" alt=""  style="height: 65px !important;max-width:100px !important;">
+                
+           <span class="font-display font-bold text-xl tracking-tight text-brandBlue flex items-center" >OffMap.</span>
+        </div>
+        
+        
+      
+      
+      <div class="hidden md:flex items-center gap-8 font-medium text-brandBlue">
+        <a href="#about" class="nav-link hover:text-brandDark transition-colors">The Flow</a>
+        <a href="#destinations" class="nav-link hover:text-brandDark transition-colors">Destinations</a>
+        <a href="#planner" class="nav-link hover:text-brandDark transition-colors">Journey Console</a>
+        <a href="#guides" class="nav-link hover:text-brandDark transition-colors">Pathkeepers</a>
+      </div>
+
+      <a href="#planner" class="bg-brandBlue text-white hover:bg-brandYellow hover:text-brandBlue border-2 border-brandBlue px-5 py-2 rounded-full font-medium text-sm transition-all shadow-md transform hover:-translate-y-0.5">
+        Plan Your Trip <i class="fa-solid fa-arrow-right ml-1"></i>
+      </a>
+    </div>
+  </nav>
+
+  <section class="min-h-screen pt-28 pb-12 px-6 flex flex-col justify-between max-w-7xl mx-auto relative overflow-hidden">
+    <div class="absolute top-1/4 right-5 w-24 h-24 text-brandBlue/10 pointer-events-none animate-spin-slow hidden lg:block" style="animation: spin 20s linear infinite;">
+      <i class="fa-solid fa-compass text-8xl"></i>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+      <div class="lg:col-span-7 z-10 space-y-6">
+        <div class="inline-flex items-center gap-2 bg-brandYellow/30 border border-brandYellow text-brandBlue font-medium text-xs px-4 py-1.5 rounded-full uppercase tracking-wider">
+          <i class="fa-solid fa-mountain-sun"></i> Adventure Redefined
+        </div>
+        <h1 class="font-display font-bold text-5xl md:text-7xl lg:text-8xl leading-none text-brandBlue tracking-tight" id="hero-title">
+          Travel slow, <br><span class="text-brandDark relative bg-brandYellow px-3 inline-block transform -rotate-1 rounded-sm my-1 shadow-md">go Offmap!</span>
+        </h1>
+        <p class="text-lg md:text-xl text-brandBlue/80 font-normal max-w-xl leading-relaxed">
+          OffMap is for people who want to travel slower. To hike without rushing, sit with a view longer, and experience places deeply. We explore every location ourselves before taking you there.
+        </p>
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="#destinations" class="bg-brandYellow text-brandBlue hover:bg-brandBlue hover:text-white border-2 border-brandYellow font-semibold px-8 py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center gap-3">
+            Explore Destinations <i class="fa-solid fa-compass"></i>
+          </a>
+          <a href="#planner" class="bg-transparent text-brandBlue hover:bg-brandBlue/5 border-2 border-brandBlue/30 font-semibold px-8 py-4 rounded-xl transition-all flex items-center gap-2">
+            Plan Your Journey
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 relative w-full h-[450px] md:h-[550px] flex items-center justify-center mt-8 lg:mt-0">
+        <div class="absolute w-[280px] h-[340px] bg-white border-8 border-white rounded-sm shadow-xl p-3 postcard-tilt-left transform hover:rotate-0 hover:scale-105 transition-all duration-500 z-20 overflow-hidden group">
+          <div class="w-full h-[240px] bg-brandBlue/20 rounded-xs overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover filter brightness-95 group-hover:scale-110 transition-transform duration-700" alt="Remote Valley Peak">
+            <span class="absolute bottom-2 left-2 bg-brandDark/60 text-white font-mono text-[10px] px-2 py-0.5 rounded-sm backdrop-blur-xs">HP // 32.11° N</span>
+          </div>
+          <div class="pt-3 font-display text-brandBlue flex justify-between items-center">
+            <span class="font-bold tracking-tight">Kinnaur Escapes</span>
+            <i class="fa-solid fa-heart text-xs text-rose-500"></i>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5">Slow trails through hidden cedar glades.</p>
+        </div>
+
+        <div class="absolute w-[260px] h-[320px] bg-white border-8 border-white rounded-sm shadow-xl p-3 postcard-tilt-right transform hover:rotate-0 hover:scale-105 transition-all duration-500 z-10 top-6 right-4 lg:-right-4 overflow-hidden group">
+          <div class="w-full h-[220px] bg-brandBlue/20 rounded-xs overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1593693411515-c202e974fe18?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover filter brightness-95 group-hover:scale-110 transition-transform duration-700" alt="Desert Dunes Twilight">
+            <span class="absolute bottom-2 left-2 bg-brandDark/60 text-white font-mono text-[10px] px-2 py-0.5 rounded-sm backdrop-blur-xs">RJ // 26.91° N</span>
+          </div>
+          <div class="pt-2 font-display text-brandBlue">
+            <span class="font-bold tracking-tight block">Thar Stargazing</span>
+            <span class="text-[10px] text-gray-400 block -mt-1">Earthy sands, deep roots.</span>
+          </div>
+        </div>
+
+        <div class="absolute -top-6 left-12 flex gap-1 z-30 transform -rotate-12 bg-brandYellow/90 border-2 border-brandBlue text-brandBlue px-4 py-1.5 font-display text-xs font-bold rounded-md shadow-md tracking-wider">
+          <i class="fa-solid fa-flag-usa animate-bounce mt-0.5"></i> HIMACHAL & RAJASTHAN SPECIALISTS
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t-2 border-brandBlue/10 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center md:text-left mt-12">
+      <div>
+        <span class="block font-display font-bold text-3xl text-brandBlue">100%</span>
+        <span class="text-xs font-medium text-brandBlue/60 uppercase tracking-wider">Scouted Individually</span>
+      </div>
+      <div>
+        <span class="block font-display font-bold text-3xl text-brandBlue">0 km</span>
+        <span class="text-xs font-medium text-brandBlue/60 uppercase tracking-wider">Rushed Sightseeing</span>
+      </div>
+      <div>
+        <span class="block font-display font-bold text-3xl text-brandBlue">3-4 Days</span>
+        <span class="text-xs font-medium text-brandBlue/60 uppercase tracking-wider">All-Inclusive Immersion</span>
+      </div>
+      <div>
+        <span class="block font-display font-bold text-3xl text-brandBlue">PAN India</span>
+        <span class="text-xs font-medium text-brandBlue/60 uppercase tracking-wider">Cultivated Community</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="bg-brandBlue text-white py-24 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5 pointer-events-none">
+      <div class="w-full h-full bg-[radial-gradient(#FAF9F5_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div class="lg:col-span-5 sticky top-28 space-y-6">
+          <span class="text-brandYellow font-display font-semibold tracking-wider uppercase text-sm block">Our Sacred Philosophy</span>
+          <h2 class="font-display font-bold text-4xl md:text-6xl text-brandYellow leading-tight">We don’t make trips around sightseeing.</h2>
+          <p class="text-lg text-brandLight/80 leading-relaxed font-normal">
+            We curate journeys around experiencing places you’re visiting. No Itineraries, Just Flow & Slow Travel. Travel shouldn’t feel rushed. That’s why we do it differently. We spend more time in fewer places, connect with locals, and discover experiences before creating trips.
+          </p>
+          <div class="p-4 bg-brandDark/40 border-l-4 border-brandYellow rounded-r-xl">
+            <p class="text-xs font-mono text-brandYellow uppercase tracking-widest"><i class="fa-solid fa-circle-nodes mr-1"></i> Ecosystem Booster</p>
+            <p class="text-sm text-brandLight/90 mt-1">Every exploration directly funnels resources into remote Indian villages, boosting local families and safeguarding native heritage landscapes.</p>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 space-y-6 pt-4 lg:pt-0">
+          <div class="text-xs font-mono text-brandYellow/70 uppercase tracking-widest mb-4 block"><i class="fa-solid fa-shoe-prints mr-2"></i> The Anatomy of an Un-Rushed Blueprint</div>
+          
+          <div class="group bg-brandDark/30 border-2 border-brandLight/10 hover:border-brandYellow/60 p-6 md:p-8 rounded-2xl transition-all duration-300 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-brandYellow/5 to-transparent pointer-events-none"></div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-brandYellow text-brandBlue flex items-center justify-center font-display font-bold text-lg shrink-0">01</div>
+              <div>
+                <h3 class="font-display font-bold text-xl text-brandYellow mb-2">We Scout Everything Blind</h3>
+                <p class="text-sm text-brandLight/80 leading-relaxed">We enter remote valleys, map uncharted trails on foot, sleep in village homesteads, and sample indigenous meals long before you step outdoors.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group bg-brandDark/30 border-2 border-brandLight/10 hover:border-brandYellow/60 p-6 md:p-8 rounded-2xl transition-all duration-300 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-brandYellow/5 to-transparent pointer-events-none"></div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-brandYellow text-brandBlue flex items-center justify-center font-display font-bold text-lg shrink-0">02</div>
+              <div>
+                <h3 class="font-display font-bold text-xl text-brandYellow mb-2">Connect Deeply with Kinfolk</h3>
+                <p class="text-sm text-brandLight/80 leading-relaxed">No mainstream tourist guides. We partner with local shepherds, local artisans, and family matriarchs to unveil oral histories and secret outlook spots.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group bg-brandDark/30 border-2 border-brandLight/10 hover:border-brandYellow/60 p-6 md:p-8 rounded-2xl transition-all duration-300 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-brandYellow/5 to-transparent pointer-events-none"></div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-brandYellow text-brandBlue flex items-center justify-center font-display font-bold text-lg shrink-0">03</div>
+              <div>
+                <h3 class="font-display font-bold text-xl text-brandYellow mb-2">The All-Inclusive 3-4 Days Flow</h3>
+                <p class="text-sm text-brandLight/80 leading-relaxed">We distill these immersive findings into beautifully planned 3-4 day itineraries where stays, cross-country logistics, and rich regional activities are built-in seamlessly.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group bg-brandDark/30 border-2 border-brandLight/10 hover:border-brandYellow/60 p-6 md:p-8 rounded-2xl transition-all duration-300 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-brandYellow/5 to-transparent pointer-events-none"></div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-brandYellow text-brandBlue flex items-center justify-center font-display font-bold text-lg shrink-0">04</div>
+              <div>
+                <h3 class="font-display font-bold text-xl text-brandYellow mb-2">Preserving Communities & Culture</h3>
+                <p class="text-sm text-brandLight/80 leading-relaxed">By hosting intimate gatherings from PAN India, we boost regional micro-economies directly and preserve vulnerable cultural ecosystems precisely as they should be.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="destinations" class="py-24 px-6 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+      <div class="space-y-2">
+        <span class="text-brandBlue font-mono text-xs uppercase tracking-widest block">// Map Coordinates Currently Active</span>
+        <h2 class="font-display font-bold text-4xl md:text-6xl text-brandBlue tracking-tight">Active Terrains Only.</h2>
+      </div>
+      <div class="flex gap-3">
+        <button id="prev-btn" class="w-12 h-12 border-2 border-brandBlue text-brandBlue hover:bg-brandBlue hover:text-white rounded-full flex items-center justify-center transition-all shadow-xs">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button id="next-btn" class="w-12 h-12 bg-brandBlue text-white hover:bg-brandYellow hover:text-brandBlue border-2 border-brandBlue rounded-full flex items-center justify-center transition-all shadow-md">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto no-scrollbar flex gap-8 pb-8 pt-4 snap-x" id="slider-track" style="scroll-behavior: smooth;">
+      
+      <div class="w-[320px] md:w-[380px] shrink-0 bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-md snap-start group relative">
+        <div class="absolute top-4 right-4 z-20 bg-brandYellow text-brandBlue font-display text-xs font-bold px-3 py-1 rounded-md border border-brandBlue shadow-xs">
+          Group Journeys
+        </div>
+        <div class="h-[260px] relative overflow-hidden bg-brandBlue/10">
+          <img src="https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Himachal Spiti Track">
+          <div class="absolute inset-0 bg-gradient-to-t from-brandDark/80 via-transparent to-transparent"></div>
+          <div class="absolute bottom-4 left-4 text-white">
+            <span class="text-[10px] font-mono tracking-widest text-brandYellow uppercase block">Himachal Pradesh</span>
+            <h3 class="font-display font-bold text-2xl">Spiti Valley Slow Flow</h3>
+          </div>
+        </div>
+        <div class="p-6 space-y-4 bg-brandLight">
+          <div class="flex items-center justify-between text-xs font-medium text-brandBlue/70 border-b border-brandBlue/10 pb-3">
+            <span><i class="fa-solid fa-calendar mr-1"></i> 4 Days / 3 Nights</span>
+            <span><i class="fa-solid fa-location-dot mr-1"></i> Kaza Base</span>
+          </div>
+          <p class="text-sm text-brandDark/80">Homestays among ancient monasteries, sunrise over crisp mountain heights, and slow evening folklore streams around fire pit rings.</p>
+          <a href="#planner" class="block text-center bg-transparent border-2 border-brandBlue text-brandBlue hover:bg-brandBlue hover:text-white py-3 rounded-xl font-semibold text-sm transition-all">
+            Secure Access Slot
+          </a>
+        </div>
+      </div>
+
+      <div class="w-[320px] md:w-[380px] shrink-0 bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-md snap-start group relative">
+        <div class="absolute top-4 right-4 z-20 bg-brandBlue text-white font-display text-xs font-bold px-3 py-1 rounded-md shadow-xs">
+          Customized Escape
+        </div>
+        <div class="h-[260px] relative overflow-hidden bg-brandBlue/10">
+          <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Rajasthan Desert Oasis">
+          <div class="absolute inset-0 bg-gradient-to-t from-brandDark/80 via-transparent to-transparent"></div>
+          <div class="absolute bottom-4 left-4 text-white">
+            <span class="text-[10px] font-mono tracking-widest text-brandYellow uppercase block">Rajasthan Desert</span>
+            <h3 class="font-display font-bold text-2xl">The Soulful Thar Retreat</h3>
+          </div>
+        </div>
+        <div class="p-6 space-y-4 bg-brandLight">
+          <div class="flex items-center justify-between text-xs font-medium text-brandBlue/70 border-b border-brandBlue/10 pb-3">
+            <span><i class="fa-solid fa-calendar mr-1"></i> Flexible Flow</span>
+            <span><i class="fa-solid fa-location-dot mr-1"></i> Jaisalmer Outer</span>
+          </div>
+          <p class="text-sm text-brandDark/80">Ditch the packed tour buses. Rest inside hand-built mud cottages, hike untamed sand ridges, and hear authentic music directly from local elders.</p>
+          <a href="#planner" class="block text-center bg-transparent border-2 border-brandBlue text-brandBlue hover:bg-brandBlue hover:text-white py-3 rounded-xl font-semibold text-sm transition-all">
+            Inquire Tailored Blueprint
+          </a>
+        </div>
+      </div>
+
+      <div class="w-[320px] md:w-[380px] shrink-0 bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-md snap-start group relative">
+        <div class="absolute top-4 right-4 z-20 bg-brandYellow text-brandBlue font-display text-xs font-bold px-3 py-1 rounded-md border border-brandBlue shadow-xs">
+          Institutional
+        </div>
+        <div class="h-[260px] relative overflow-hidden bg-brandBlue/10">
+          <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Trekking Group Ridge">
+          <div class="absolute inset-0 bg-gradient-to-t from-brandDark/80 via-transparent to-transparent"></div>
+          <div class="absolute bottom-4 left-4 text-white">
+            <span class="text-[10px] font-mono tracking-widest text-brandYellow uppercase block">Dhauladhar Slopes</span>
+            <h3 class="font-display font-bold text-2xl">School & Corporate Collectives</h3>
+          </div>
+        </div>
+        <div class="p-6 space-y-4 bg-brandLight">
+          <div class="flex items-center justify-between text-xs font-medium text-brandBlue/70 border-b border-brandBlue/10 pb-3">
+            <span><i class="fa-solid fa-calendar mr-1"></i> 3-5 Day Enclaves</span>
+            <span><i class="fa-solid fa-location-dot mr-1"></i> Kangra Valley</span>
+          </div>
+          <p class="text-sm text-brandDark/80">Re-center corporate groups or students with structured wilderness therapy mapping, local farm cultivation help, and group dynamic builds.</p>
+          <a href="#planner" class="block text-center bg-transparent border-2 border-brandBlue text-brandBlue hover:bg-brandBlue hover:text-white py-3 rounded-xl font-semibold text-sm transition-all">
+            Download Institutional Specs
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="planner" class="py-24 px-6 bg-brandYellow/10 border-t-2 border-b-2 border-brandBlue/10 relative">
+    <div class="max-w-4xl mx-auto bg-white border-2 border-brandBlue rounded-3xl shadow-xl overflow-hidden p-8 md:p-12 relative">
+      <div class="absolute top-0 right-12 transform -translate-y-1/2 bg-brandYellow border-2 border-brandBlue text-brandBlue font-display font-bold text-xs px-4 py-2 rounded-md shadow-md tracking-widest uppercase">
+        Intake Terminal v1.02
+      </div>
+
+      <div class="text-center space-y-3 mb-10 max-w-xl mx-auto">
+        <h2 class="font-display font-bold text-3xl md:text-5xl text-brandBlue">Journey Engineering Console</h2>
+        <p class="text-sm text-brandBlue/70">We don't send cold cookie-cutter pamphlets. Let us know how you prefer to flow, and our field team will design an offbeat route specifically for your timeline.</p>
+      </div>
+
+      <form class="space-y-8" onsubmit="event.preventDefault(); alert('Journey specifications registered! Our local scout team will map your terrain flow within 12 hours.');">
+        
+        <div class="space-y-3">
+          <label class="block text-xs font-mono font-bold uppercase tracking-wider text-brandBlue"><i class="fa-solid fa-tags mr-1"></i> Select Desired Journey Mode</label>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" onclick="toggleChip(this)" class="px-5 py-3 rounded-xl border-2 border-brandBlue text-sm font-semibold bg-brandBlue text-white transition-all transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-users mr-1"></i> Small Group Gathering
+            </button>
+            <button type="button" onclick="toggleChip(this)" class="px-5 py-3 rounded-xl border-2 border-brandBlue text-sm font-semibold bg-white text-brandBlue hover:bg-brandBlue/5 transition-all transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-sliders mr-1"></i> Fully Customized Route
+            </button>
+            <button type="button" onclick="toggleChip(this)" class="px-5 py-3 rounded-xl border-2 border-brandBlue text-sm font-semibold bg-white text-brandBlue hover:bg-brandBlue/5 transition-all transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-school mr-1"></i> School / Educational Expedition
+            </button>
+            <button type="button" onclick="toggleChip(this)" class="px-5 py-3 rounded-xl border-2 border-brandBlue text-sm font-semibold bg-white text-brandBlue hover:bg-brandBlue/5 transition-all transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-building mr-1"></i> Corporate Team Enclave
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-xs font-mono font-bold uppercase tracking-wider text-brandBlue">Primary Target Terrain</label>
+            <select class="w-full bg-brandLight border-2 border-brandBlue rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brandYellow">
+              <option>Himachal Pradesh (High Wilderness Glades & Trails)</option>
+              <option>Rajasthan Dunes (Rural Outposts & Heritage Stays)</option>
+              <option>Unsure (Let the Scouts Recommend)</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-mono font-bold uppercase tracking-wider text-brandBlue">Your Digital Call Sign (Full Name)</label>
+            <input type="text" placeholder="e.g. Kabir Thapar" required class="w-full bg-brandLight border-2 border-brandBlue rounded-xl px-4 py-3 text-sm font-medium placeholder-brandBlue/40 focus:outline-none focus:ring-2 focus:ring-brandYellow">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-xs font-mono font-bold uppercase tracking-wider text-brandBlue">Secure Signal Coordinates (Email Address)</label>
+            <input type="email" placeholder="naina.talwar@field.com" required class="w-full bg-brandLight border-2 border-brandBlue rounded-xl px-4 py-3 text-sm font-medium placeholder-brandBlue/40 focus:outline-none focus:ring-2 focus:ring-brandYellow">
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-mono font-bold uppercase tracking-wider text-brandBlue">Expected Flow Window (Target Month/Year)</label>
+            <input type="text" placeholder="e.g. October 2026" required class="w-full bg-brandLight border-2 border-brandBlue rounded-xl px-4 py-3 text-sm font-medium placeholder-brandBlue/40 focus:outline-none focus:ring-2 focus:ring-brandYellow">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-brandYellow hover:bg-brandBlue text-brandBlue hover:text-white border-2 border-brandBlue font-display font-bold text-lg py-4 rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1 uppercase tracking-wider">
+          Transmit Blueprint Request <i class="fa-solid fa-paper-plane ml-1 text-sm"></i>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section id="guides" class="py-24 px-6 max-w-7xl mx-auto">
+    <div class="text-center space-y-3 mb-16">
+      <span class="text-xs font-mono text-brandBlue/60 uppercase tracking-widest block">// Experienced Field Operatives</span>
+      <h2 class="font-display font-bold text-4xl md:text-6xl text-brandBlue">The Pathkeepers</h2>
+      <p class="text-sm text-brandBlue/70 max-w-md mx-auto">We don't manage journeys via clipboards from city centers. Our scout architects accompany you directly on site.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      
+      <div class="bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-sm group">
+        <div class="aspect-[3/4] bg-brandBlue/10 relative overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Scout Operative">
+          <div class="absolute inset-0 bg-brandBlue/10 mix-blend-multiply"></div>
+        </div>
+        <div class="p-4 bg-brandLight border-t border-brandBlue/10 text-center">
+          <h4 class="font-display font-bold text-lg text-brandBlue">Anya Sharma</h4>
+          <p class="text-xs font-mono uppercase text-brandBlue/60 tracking-wider mt-0.5">High Ridge Kinnaur Specialist</p>
+        </div>
+      </div>
+
+      <div class="bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-sm group">
+        <div class="aspect-[3/4] bg-brandBlue/10 relative overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Scout Operative">
+          <div class="absolute inset-0 bg-brandBlue/10 mix-blend-multiply"></div>
+        </div>
+        <div class="p-4 bg-brandLight border-t border-brandBlue/10 text-center">
+          <h4 class="font-display font-bold text-lg text-brandBlue">Rohan Verma</h4>
+          <p class="text-xs font-mono uppercase text-brandBlue/60 tracking-wider mt-0.5">Thar Oral History Archivist</p>
+        </div>
+      </div>
+
+      <div class="bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-sm group">
+        <div class="aspect-[3/4] bg-brandBlue/10 relative overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Scout Operative">
+          <div class="absolute inset-0 bg-brandBlue/10 mix-blend-multiply"></div>
+        </div>
+        <div class="p-4 bg-brandLight border-t border-brandBlue/10 text-center">
+          <h4 class="font-display font-bold text-lg text-brandBlue">Devika Nath</h4>
+          <p class="text-xs font-mono uppercase text-brandBlue/60 tracking-wider mt-0.5">Spiti Logistics Commander</p>
+        </div>
+      </div>
+
+      <div class="bg-white border-2 border-brandBlue rounded-2xl overflow-hidden shadow-sm group">
+        <div class="aspect-[3/4] bg-brandBlue/10 relative overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Scout Operative">
+          <div class="absolute inset-0 bg-brandBlue/10 mix-blend-multiply"></div>
+        </div>
+        <div class="p-4 bg-brandLight border-t border-brandBlue/10 text-center">
+          <h4 class="font-display font-bold text-lg text-brandBlue">Kabir Gill</h4>
+          <p class="text-xs font-mono uppercase text-brandBlue/60 tracking-wider mt-0.5">Glacial Path Navigator</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="bg-brandBlue text-white border-t-4 border-brandYellow pt-16 pb-8 px-6">
+    <div class="max-w-7xl mx-auto space-y-12">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        
+        <div class="md:col-span-5 space-y-4">
+          <a href="#" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-brandYellow flex items-center justify-center font-display font-bold text-brandBlue">O</div>
+            <span class="font-display font-bold text-2xl tracking-tight text-white">OffMap.</span>
+          </a>
+          <p class="text-sm text-brandLight/70 max-w-sm leading-relaxed">
+            Curating deep, un-rushed human connections across India's remaining hidden geographic landscapes. Outcasts to tourist trends since day one.
+          </p>
+          <div class="flex gap-4 pt-2">
+            <a href="#" class="w-10 h-10 rounded-xl bg-brandDark/40 flex items-center justify-center text-brandYellow border border-brandLight/10 hover:bg-brandYellow hover:text-brandBlue transition-all"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-brandDark/40 flex items-center justify-center text-brandYellow border border-brandLight/10 hover:bg-brandYellow hover:text-brandBlue transition-all"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-brandDark/40 flex items-center justify-center text-brandYellow border border-brandLight/10 hover:bg-brandYellow hover:text-brandBlue transition-all"><i class="fa-brands fa-spotify"></i></a>
+          </div>
+        </div>
+
+        <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          <div class="space-y-3">
+            <h5 class="font-display font-bold text-brandYellow uppercase tracking-wider text-xs">Navigation</h5>
+            <ul class="space-y-2 text-sm text-brandLight/80">
+              <li><a href="#about" class="hover:text-white transition-colors">Philosophy</a></li>
+              <li><a href="#destinations" class="hover:text-white transition-colors">Active Camps</a></li>
+              <li><a href="#planner" class="hover:text-white transition-colors">Intake Console</a></li>
+            </ul>
+          </div>
+          <div class="space-y-3">
+            <h5 class="font-display font-bold text-brandYellow uppercase tracking-wider text-xs">Sectors</h5>
+            <ul class="space-y-2 text-sm text-brandLight/80">
+              <li><a href="#" class="hover:text-white transition-colors">Himachal Highlands</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Rajasthan Arid Outposts</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Community Gatherings</a></li>
+            </ul>
+          </div>
+          <div class="space-y-3 col-span-2 sm:col-span-1">
+            <h5 class="font-display font-bold text-brandYellow uppercase tracking-wider text-xs">Field Outposts</h5>
+            <p class="text-xs text-brandLight/60 font-mono leading-normal">
+              Base Kaza, Spiti Valley<br>
+              Outer Dunes Rim, Jaisalmer<br>
+              Signal: scout@offmap.travel
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-brandLight/10 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-brandLight/40 gap-4">
+        <span>© 2026 OffMap Travel Networks. Preserving Culture Natively.</span>
+        <div class="flex gap-6">
+          <a href="#" class="hover:text-brandLight transition-colors">Scout Protocols</a>
+          <a href="#" class="hover:text-brandLight transition-colors">Ecosystem Metric Tracking</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize GSAP ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Kinetic Magnetic Custom Cursor Element Tracking logic
+    const cursor = document.getElementById('cursor');
+    if (cursor) {
+      document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+      });
+
+      // Target relevant action zones for cursor expands
+      const links = document.querySelectorAll('a, button, select, input, option');
+      links.forEach(link => {
+        link.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+        link.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+      });
+    }
+
+    // Interactive Navbar Blur & Solid Border Scaling on scroll
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        nav.classList.remove('py-4');
+        nav.classList.add('py-2');
+      } else {
+        nav.classList.remove('py-2');
+        nav.classList.add('py-4');
+      }
+    });
+
+    // Toggle logic for Interactive Chip Array Selection indicators
+    function toggleChip(button) {
+      const parent = button.parentElement;
+      const buttons = parent.querySelectorAll('button');
+      
+      // Clean previous active chip styling
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-brandBlue', 'text-white');
+        btn.classList.add('bg-white', 'text-brandBlue');
+      });
+      
+      // Arm targeted chip activation sequence
+      button.classList.remove('bg-white', 'text-brandBlue');
+      button.classList.add('bg-brandBlue', 'text-white');
+    }
+
+    // Native custom horizontal slider tracking math links
+    const sliderTrack = document.getElementById('slider-track');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (sliderTrack && prevBtn && nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        sliderTrack.scrollLeft += 360;
+      });
+      prevBtn.addEventListener('click', () => {
+        sliderTrack.scrollLeft -= 360;
+      });
+    }
+
+    // GSAP Immersive Entry Animations Orchestration
+    gsap.from("#hero-title", {
+      opacity: 0,
+      y: 40,
+      duration: 1,
+      ease: "power4.out"
+    });
+
+    gsap.from("section p", {
+      opacity: 0,
+      y: 20,
+      duration: 1.2,
+      delay: 0.2,
+      ease: "power3.out"
+    });
+  </script>
+</body>
+</html>

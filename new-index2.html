@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffMap | Deep & Slow Journeys</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* --- BRAND DESIGN SYSTEM --- */
+        :root {
+            --yellow: #FFDE2F;
+            --blue: #134E86;
+            --white: #FFFFFF;
+            --bg-dark: #0A141D;
+            --bg-light: #FBFBFA;
+            --text-dark: #0F161C;
+            --text-muted: rgba(15, 22, 28, 0.65);
+            --border-alpha: rgba(19, 78, 134, 0.12);
+            --font-display: 'Cormorant Garamond', serif;
+            --font-sans: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- STYLISH NAVIGATION BAR --- */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1000;
+            background: rgba(251, 251, 250, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-alpha);
+        }
+
+        .nav-logo img {
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--blue);
+        }
+
+        .nav-action-btn {
+            background: var(--blue);
+            color: var(--white) !important;
+            padding: 12px 26px;
+            border-radius: 30px;
+            font-size: 0.85rem !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .nav-action-btn:hover {
+            background: var(--text-dark);
+            transform: translateY(-1px);
+        }
+
+        /* --- PRETTY PRAYER FLAGS RIBBON ACCENT --- */
+        .prayer-ribbon {
+            width: 100%;
+            height: 3px;
+            display: flex;
+            position: absolute;
+            top: 90px;
+            left: 0;
+            z-index: 99;
+        }
+        .ribbon-segment { flex: 1; height: 100%; }
+        .seg-1 { background-color: #0056B3; }
+        .seg-2 { background-color: var(--yellow); }
+        .seg-3 { background-color: #eb7f22; }
+        .seg-4 { background-color: #28A745; }
+        .seg-5 { background-color: #DC3545; }
+
+        /* --- INTERACTIVE BUTTON MODULES --- */
+        .cta-solid {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            padding: 18px 36px;
+            background-color: var(--text-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cta-solid:hover {
+            background-color: var(--blue);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(19, 78, 134, 0.15);
+        }
+
+        .cta-outline {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            padding: 18px 36px;
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 1.5px solid var(--text-dark);
+            border-radius: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .cta-outline:hover {
+            background-color: var(--text-dark);
+            color: var(--white);
+        }
+
+        /* --- SECTION 1: THE PRESTIGE SPLIT HERO --- */
+        .hero-viewport {
+            min-height: 100vh;
+            display: flex;
+            padding-top: 90px;
+            background-color: var(--bg-light);
+        }
+
+        .hero-content-frame {
+            flex: 1.1;
+            padding: 6% 7% 4% 7%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-tagline {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .hero-main-title {
+            font-family: var(--font-sans);
+            font-size: clamp(3rem, 5.5vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            margin-bottom: 30px;
+        }
+
+        .hero-main-title em {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-style: italic;
+            color: var(--blue);
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            line-height: 1.65;
+            color: var(--text-muted);
+            max-width: 540px;
+            margin-bottom: 45px;
+            font-weight: 300;
+        }
+
+        .hero-button-cluster {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* High-End Floating Postcard Concept */
+        .floating-editorial-card {
+            position: absolute;
+            bottom: 6%;
+            right: 8%;
+            width: 170px;
+            background: var(--white);
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border-radius: 4px;
+            transform: rotate(4deg);
+            transition: transform 0.4s ease;
+            z-index: 10;
+        }
+
+        .floating-editorial-card:hover {
+            transform: rotate(0deg) translateY(-5px);
+        }
+
+        .floating-editorial-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .floating-editorial-card span {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: 8px;
+            text-align: center;
+            color: var(--blue);
+        }
+
+        .hero-media-frame {
+            flex: 0.9;
+            position: relative;
+            background-color: var(--text-dark);
+            overflow: hidden;
+            /* opt4 */
+            /* margin-left: -80px; */
+            /* opt3 */
+             clip-path: ellipse(100% 100% at 100% 50%);
+        }
+        /* option4 */
+        /* .hero-media-frame::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100%;
+            z-index: 2;
+
+            background: linear-gradient(
+                to right,
+                #F8F5EE,
+                rgba(248,245,238,0)
+            );
+        } */
+
+        .hero-ambient-video {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            filter: contrast(1.05) brightness(0.9);
+        }
+
+        /* --- SECTION 2: THE ANTI-SIGHTSEEING MANIFESTO --- */
+        .manifesto-viewport {
+            padding: 140px 8%;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-alpha);
+        }
+
+        .manifesto-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+        }
+
+        .manifesto-header h2 {
+            font-family: var(--font-sans);
+            font-size: clamp(2.2rem, 3.8vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+        }
+
+        .manifesto-header h2 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 500;
+            color: var(--blue);
+        }
+
+        .manifesto-body-text p {
+            font-size: 1.15rem;
+            line-height: 1.75;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        /* Interactive Manifesto Switcher */
+        .philosophy-switcher {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-alpha);
+            border-radius: 16px;
+            padding: 40px;
+            margin-top: 20px;
+        }
+
+        .switch-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-alpha);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .switch-anchor {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.3);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .switch-anchor.is-active {
+            color: var(--blue);
+        }
+
+        .switch-anchor.is-active::after {
+            content: '';
+            position: absolute;
+            bottom: -21px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--blue);
+        }
+
+        .switch-pane { display: none; }
+        .switch-pane.is-active { display: block; animation: smoothFade 0.5s ease forwards; }
+
+        .switch-pane ul { list-style: none; }
+        .switch-pane ul li {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 400;
+        }
+
+        .switch-pane ul li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: var(--yellow);
+            border-radius: 50%;
+        }
+
+        /* --- SECTION 3: THE AVANT-GARDE MAP TRACKER --- */
+        /* .map-viewport {
+            padding: 130px 5%;
+            background-color: var(--bg-dark);
+            color: var(--white);
+        } */
+
+        .map-section-title {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .map-section-title h2 {
+            font-size: clamp(2.5rem, 4vw, 3.8rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .map-section-title h2 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--yellow);
+            font-weight: 500;
+        }
+
+        .map-console-grid {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        /* Dark High-Tech Blueprint Vector Area */
+        .map-vector-container {
+            background-color: rgba(19, 78, 134, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .map-vector-container::before {
+            content: 'SLOW TRAVEL SCOUT RADAR';
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.4;
+            font-weight: 600;
+        }
+
+        .blueprint-svg {
+            width: 100%;
+            max-width: 440px;
+            height: auto;
+        }
+
+        .blueprint-path {
+            fill: rgba(255, 255, 255, 0.02);
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .blueprint-path:hover, .blueprint-path.is-active {
+            fill: rgba(19, 78, 134, 0.4);
+            stroke: var(--yellow);
+            stroke-dasharray: 0;
+            stroke-width: 3;
+        }
+
+        .interactive-node {
+            cursor: pointer;
+        }
+
+        .interactive-node text {
+            font-family: var(--font-sans);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            fill: rgba(255,255,255,0.7);
+            transition: fill 0.3s ease;
+        }
+
+        .interactive-node:hover text, .interactive-node.is-active text {
+            fill: var(--yellow);
+        }
+
+        /* Dynamic Cards Flow */
+        .map-data-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 35px;
+            color: black;
+            border-left: 3px solid var(--yellow);
+            padding-left: 20px;
+        }
+
+        .cards-cluster-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .editorial-trip-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .editorial-trip-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(19, 78, 134, 0.5);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .editorial-trip-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            filter: grayscale(0.2);
+            transition: filter 0.3s ease;
+        }
+
+        .editorial-trip-card:hover img {
+            filter: grayscale(0);
+        }
+
+        .card-inner-details {
+            padding: 20px;
+        }
+
+        .card-inner-details .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--yellow);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .card-inner-details h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-inner-details p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.6);
+            font-weight: 300;
+        }
+
+        /* --- SECTION 4: THE EDITORIAL BLUEPRINT JOURNEY --- */
+        .process-viewport {
+            padding: 140px 8%;
+            background-color: var(--bg-light);
+            border-bottom: 1px solid var(--border-alpha);
+        }
+
+        .process-title-area {
+            text-align: center;
+            margin-bottom: 90px;
+        }
+
+        .process-title-area h2 {
+            font-size: clamp(2.3rem, 4vw, 3.6rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .process-title-area h2 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        .step-linear-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .step-minimal-card {
+            position: relative;
+        }
+
+        .step-index {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: rgba(19, 78, 134, 0.1);
+            line-height: 1;
+            margin-bottom: 15px;
+            font-family: var(--font-sans);
+        }
+
+        .step-minimal-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .step-minimal-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* --- SECTION 5: THE CINEMATIC PHOTO JOURNAL --- */
+        .journal-viewport {
+            padding: 140px 0;
+            background-color: var(--white);
+        }
+
+        .journal-header {
+            padding: 0 8%;
+            margin-bottom: 60px;
+        }
+
+        .journal-header h2 {
+            font-size: clamp(2.3rem, 4vw, 3.6rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .journal-header h2 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        .horizontal-scroll-deck {
+            width: 100%;
+            overflow-x: auto;
+            padding: 20px 8%;
+            scrollbar-width: none;
+        }
+        .horizontal-scroll-deck::-webkit-scrollbar { display: none; }
+
+        .deck-slider {
+            display: flex;
+            gap: 40px;
+            width: max-content;
+        }
+
+        /* Borderless Premium Travel Frames */
+        .editorial-photo-frame {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .editorial-photo-frame:hover {
+            transform: scale(1.03);
+        }
+
+        .editorial-photo-frame img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        }
+
+        .editorial-photo-frame h4 {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 500;
+            font-size: 1.6rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .editorial-photo-frame span {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* --- SECTION 6: THE PREMIUM CONSOLE FOOTER --- */
+        .footer-viewport {
+            background-color: var(--bg-dark);
+            color: var(--white);
+            padding: 120px 8% 50px 8%;
+        }
+
+        .footer-main-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 100px;
+            margin-bottom: 80px;
+        }
+
+        .footer-branding-column h3 {
+            font-size: clamp(2.5rem, 4.5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 30px;
+        }
+
+        .footer-branding-column h3 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--yellow);
+            font-weight: 500;
+        }
+
+        .footer-branding-column p {
+            font-size: 1.1rem;
+            line-height: 1.65;
+            color: rgba(255,255,255,0.6);
+            font-weight: 300;
+            max-width: 460px;
+        }
+
+        /* Sleek Journey Planner Form */
+        .premium-planner-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 45px;
+        }
+
+        .planner-row-group {
+            margin-bottom: 30px;
+        }
+
+        .planner-row-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 14px;
+        }
+
+        .pill-selection-cluster {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .selection-pill {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--white);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .selection-pill.is-selected {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border-color: var(--white);
+        }
+
+        .premium-text-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--white);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .premium-text-input:focus {
+            border-color: var(--yellow);
+        }
+
+        .btn-submit-premium {
+            width: 100%;
+            padding: 18px;
+            border-radius: 4px;
+            border: none;
+            background-color: var(--yellow);
+            color: var(--text-dark);
+            font-family: var(--font-sans);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit-premium:hover {
+            background-color: var(--white);
+        }
+
+        .footer-base-line {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            font-weight: 300;
+        }
+
+        /* --- RESPONSIVE MECHANICS --- */
+        @keyframes smoothFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media(max-width: 1024px) {
+            .hero-viewport { flex-direction: column; }
+            .hero-media-frame { min-height: 450px; }
+            .manifesto-grid { grid-template-columns: 1fr; gap: 50px; }
+            .map-console-grid { grid-template-columns: 1fr; gap: 60px; }
+            .step-linear-container { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+            .footer-main-grid { grid-template-columns: 1fr; gap: 60px; }
+        }
+
+        @media(max-width: 640px) {
+            .step-linear-container { grid-template-columns: 1fr; }
+            .cards-cluster-grid { grid-template-columns: 1fr; }
+            .nav-menu { display: none; }
+        }
+
+        #leafletMap{
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-logo">
+            <img src="https://komalsbabar.github.io/traveleee-offmap/img/logo.png" alt="OffMap Logo">
+        </a>
+        <div class="nav-menu">
+            <a href="#philosophy">Philosophy</a>
+            <a href="#map">Destinations</a>
+            <a href="#process">Process</a>
+            <a href="#journal">Journal</a>
+            <a href="#planner" class="nav-action-btn">Plan Yours</a>
+        </div>
+    </nav>
+
+    <div class="prayer-ribbon">
+        <div class="ribbon-segment seg-1"></div>
+        <div class="ribbon-segment seg-2"></div>
+        <div class="ribbon-segment seg-3"></div>
+        <div class="ribbon-segment seg-4"></div>
+        <div class="ribbon-segment seg-5"></div>
+    </div>
+
+    <header class="hero-viewport">
+        <div class="hero-content-frame">
+            <span class="hero-tagline">Slow Travel Movement</span>
+            <h1 class="hero-main-title">Travel slow,<br>go <em>Offmap!</em></h1>
+            <p class="hero-description">OffMap is designed intentionally for people who want to travel slower. To hike without rushing, sit with a panorama longer, and experience pristine regional places deeply. We scout every track ourselves.</p>
+            <div class="hero-button-cluster">
+                <a href="#map" class="cta-solid">Explore Destinations</a>
+                <a href="#planner" class="cta-outline">Plan Your Trip</a>
+            </div>
+            
+            <!-- <div class="floating-editorial-card">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=cover&w=400&q=80" alt="Scouted">
+                <span>Live Route 📍</span>
+            </div> -->
+        </div>
+        <div class="hero-media-frame">
+            <video class="hero-ambient-video" autoplay loop muted playsinline>
+                <source src="v4.mp4" type="video/mp4">
+            </video>
+        </div>
+    </header>
+
+    <section class="manifesto-viewport" id="philosophy">
+        <div class="manifesto-grid">
+            <div class="manifesto-header">
+                <h2>We do not craft simple trips built for <em>sightseeing.</em></h2>
+            </div>
+            <div class="manifesto-body-text">
+                <p>We curate thoughtful journeys centered around genuinely living the places you visit. No forced rigid itineraries. Just natural flow and deliberate slow travel.</p>
+                
+                <div class="philosophy-switcher">
+                    <div class="switch-header">
+                        <button class="switch-anchor is-active" onclick="togglePhilosophy('flow', this)">The Flow</button>
+                        <button class="switch-anchor" onclick="togglePhilosophy('rush', this)">The Rush</button>
+                    </div>
+                    <div id="pane-flow" class="switch-pane is-active">
+                        <ul>
+                            <li>Deep authentic connections with community elders</li>
+                            <li>Venturing into remote valleys away from maps</li>
+                            <li>All-inclusive 3-4 days immersive slow living</li>
+                            <li>Directly supporting local remote economies</li>
+                        </ul>
+                    </div>
+                    <div id="pane-rush" class="switch-pane">
+                        <ul>
+                            <li>Rushed checklist tours packed into tourist hubs</li>
+                            <li>Zero downtime to absorb views and quiet moments</li>
+                            <li>Surface experiences behind generic tour bus glass</li>
+                            <li>Mass commercial structures ignoring local culture</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- <section class="map-viewport" id="map">
+        <div class="map-section-title">
+            <h2>Track Active <em>Routes</em></h2>
+        </div>
+
+        <div class="map-console-grid">
+            <div class="map-vector-container">
+                <svg viewBox="0 0 400 400" class="blueprint-svg">
+                    <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    
+                    <path d="M 70 170 L 150 150 L 170 220 L 100 270 L 60 220 Z" class="blueprint-path is-active" id="path-rajasthan" onclick="renderRegion('rajasthan')" />
+                    <path d="M 160 80 L 220 60 L 240 110 L 190 140 L 150 110 Z" class="blueprint-path" id="path-himachal" onclick="renderRegion('himachal')" />
+                    
+                    <g class="interactive-node" onclick="renderRegion('himachal')">
+                        <circle cx="195" cy="95" r="5" fill="#FFDE2F" />
+                        <text x="210" y="98">HIMACHAL</text>
+                    </g>
+                    <g class="interactive-node is-active" onclick="renderRegion('rajasthan')">
+                        <circle cx="115" cy="205" r="5" fill="#FFDE2F" />
+                        <text x="75" y="190">RAJASTHAN</text>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="map-data-panel">
+                <h3 class="panel-header-title" id="panel-title">Rajasthan Canvas</h3>
+                <div class="cards-cluster-grid" id="panel-cards">
+                    <div class="editorial-trip-card">
+                        <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=400&q=80" alt="Desert Drift">
+                        <div class="card-inner-details">
+                            <span class="badge">Group Trip</span>
+                            <h4>Desert Drift</h4>
+                            <p>Stargazing across remote pristine sand trails without tourist lines.</p>
+                        </div>
+                    </div>
+                    <div class="editorial-trip-card">
+                        <img src="https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=400&q=80" alt="Aravali Farm">
+                        <div class="card-inner-details">
+                            <span class="badge">Stays</span>
+                            <h4>Aravali Manor</h4>
+                            <p>An ancient regional cottage focused completely on slow-living living loops.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <section class="map-viewport" id="map">
+
+    <div class="map-section-title">
+        <h2>Journey Starts from <em>Delhi</em></h2>
+    </div>
+
+    <div class="map-console-grid">
+
+        <!-- MAP -->
+        <div id="leafletMap" class="map-vector-container"></div>
+
+        <!-- RIGHT PANEL -->
+        <div class="map-data-panel">
+            <h3 class="panel-header-title" id="panel-title">Select a Route</h3>
+            <div class="cards-cluster-grid" id="panel-cards"></div>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+    <section class="process-viewport" id="process">
+        <div class="process-title-area">
+            <h2>The Booking <em>Blueprint</em></h2>
+        </div>
+        
+        <div class="step-linear-container">
+            <div class="step-minimal-card">
+                <div class="step-index">01</div>
+                <h3>WhatsApp Sync</h3>
+                <p>Connect with our route scouts instantly on WhatsApp. No complicated digital onboarding dashboards or rigid lines.</p>
+            </div>
+            <div class="step-minimal-card">
+                <div class="step-index">02</div>
+                <h3>Blueprint Reveal</h3>
+                <p>Receive your custom, deliberately spaced itinerary blueprint detailing regional stays and wilderness trails.</p>
+            </div>
+            <div class="step-minimal-card">
+                <div class="step-index">03</div>
+                <h3>30% Safe Slot</h3>
+                <p>Lock down your spot cleanly with a 30% slot reservation deposit. Remainder clears comfortably right before departure.</p>
+            </div>
+            <div class="step-minimal-card">
+                <div class="step-index">04</div>
+                <h3>Delhi Departure</h3>
+                <p>Our slow-travel community groups assemble cleanly in Delhi before charting paths directly to hidden Indian gems.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="journal-viewport" id="journal">
+        <div class="journal-header">
+            <h2>Captured <em>Journeys</em></h2>
+        </div>
+
+        <div class="horizontal-scroll-deck">
+            <div class="deck-slider">
+                <div class="editorial-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=cover&w=400&q=80" alt="Trail Frames">
+                    <h4>"Quiet ridges, zero rush."</h4>
+                    <span>Himachal Trails</span>
+                </div>
+                <div class="editorial-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=cover&w=400&q=80" alt="Community Frames">
+                    <h4>"The flow over rigid schedules."</h4>
+                    <span>Group Living</span>
+                </div>
+                <div class="editorial-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=cover&w=400&q=80" alt="Desert Lines">
+                    <h4>"Dunes that feel infinite."</h4>
+                    <span>Rajasthan Camps</span>
+                </div>
+                <div class="editorial-photo-frame">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=cover&w=400&q=80" alt="Summit Views">
+                    <h4>"Sitting with a viewpoint longer."</h4>
+                    <span>Kinnaur Passes</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-viewport" id="planner">
+        <div class="footer-main-grid">
+            <div class="footer-branding-column">
+                <h3>Let's step completely <em>OffMap.</em></h3>
+                <p>Whether you seek curated slow group trips, customized trail escapes, organic stays, or corporate/school breathers—we configure paths directly from Delhi.</p>
+            </div>
+
+            <div class="premium-planner-card">
+                <div class="planner-row-group">
+                    <label>Select Your Modality</label>
+                    <div class="pill-selection-cluster" id="cluster-modality">
+                        <button class="selection-pill is-selected" onclick="togglePill('modality', this)">Group Journeys</button>
+                        <button class="selection-pill" onclick="togglePill('modality', this)">Custom Escapes</button>
+                        <button class="selection-pill" onclick="togglePill('modality', this)">Slow Stays</button>
+                        <button class="selection-pill" onclick="togglePill('modality', this)">Corporate/School</button>
+                    </div>
+                </div>
+
+                <div class="planner-row-group">
+                    <label>Target Ground</label>
+                    <div class="pill-selection-cluster" id="cluster-ground">
+                        <button class="selection-pill is-selected" onclick="togglePill('ground', this)">Himachal Valleys</button>
+                        <button class="selection-pill" onclick="togglePill('ground', this)">Rajasthan Plains</button>
+                    </div>
+                </div>
+
+                <div class="planner-row-group">
+                    <label>Notes / Traveler Name</label>
+                    <input type="text" id="planner-input-field" class="premium-text-input" placeholder="Type your slow travel ideas here...">
+                </div>
+
+                <button class="btn-submit-premium" onclick="executeWhatsAppRouting()">Request Route Blueprint</button>
+            </div>
+        </div>
+
+        <div class="footer-base-line">
+            <p>&copy; 2026 OffMap Travel Network. Preserving gems responsibly.</p>
+            <p>Designed with intentional geometric flow.</p>
+        </div>
+    </footer>
+
+   
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+   <script>
+const canvasData = {
+    himachal: {
+        title: "Delhi → Himachal Journey",
+        items: [
+            {
+                tag: "Group Trip",
+                title: "Spiti Silence Trail",
+                desc: "High altitude slow travel across stone villages.",
+                img: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=cover&w=400&q=80"
+            },
+            {
+                tag: "Stay",
+                title: "Tirthan Valley Base",
+                desc: "River-side slow living experience in forest homes.",
+                img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=cover&w=400&q=80"
+            }
+        ]
+    },
+
+    rajasthan: {
+        title: "Delhi → Rajasthan Journey",
+        items: [
+            {
+                tag: "Group Trip",
+                title: "Desert Drift",
+                desc: "Stargazing in Thar desert with no light pollution.",
+                img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=cover&w=400&q=80"
+            },
+            {
+                tag: "Stay",
+                title: "Aravali Heritage Stay",
+                desc: "Ancient haveli slow-living experience.",
+                img: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?auto=format&fit=cover&w=400&q=80"
+            }
+        ]
+    }
+};
+
+// MAP INIT
+const map = L.map('leafletMap').setView([28.2, 75.5], 6); // slightly tilted towards Rajasthan
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// COORDINATES
+const delhi = [28.6139, 77.2090];
+const himachal = [31.1048, 77.1734];
+const rajasthan = [27.0238, 74.2179];
+
+// MARKERS
+const delhiMarker = L.marker(delhi).addTo(map).bindPopup("Delhi - Start Point");
+const himachalMarker = L.marker(himachal).addTo(map).bindPopup("Himachal Pradesh");
+const rajasthanMarker = L.marker(rajasthan).addTo(map).bindPopup("Rajasthan");
+
+// ROUTES
+const routeHimachal = L.polyline([delhi, himachal], {
+    color: "#2E86FF",
+    weight: 4
+}).addTo(map);
+
+const routeRajasthan = L.polyline([delhi, rajasthan], {
+    color: "#FFDE2F",
+    weight: 5
+}).addTo(map);
+
+// CLICK EVENTS
+himachalMarker.on('click', () => renderRegion('himachal'));
+rajasthanMarker.on('click', () => renderRegion('rajasthan'));
+
+routeHimachal.on('click', () => renderRegion('himachal'));
+routeRajasthan.on('click', () => renderRegion('rajasthan'));
+
+// RIGHT PANEL RENDER
+function renderRegion(key){
+    const data = canvasData[key];
+
+    document.getElementById("panel-title").innerText = data.title;
+
+    let html = "";
+    data.items.forEach(item => {
+        html += `
+            <div class="editorial-trip-card">
+                <img src="${item.img}">
+                <div class="card-inner-details">
+                    <span class="badge">${item.tag}</span>
+                    <h4>${item.title}</h4>
+                    <p>${item.desc}</p>
+                </div>
+            </div>
+        `;
+    });
+
+    document.getElementById("panel-cards").innerHTML = html;
+}
+
+// 🔥 DEFAULT STATE = RAJASTHAN
+window.addEventListener("load", () => {
+    renderRegion("rajasthan");
+
+    // emphasize Rajasthan visually
+    routeRajasthan.setStyle({ color: "#FFDE2F", weight: 6 });
+    routeHimachal.setStyle({ opacity: 0.4 });
+
+    map.setView(rajasthan, 6);
+});
+</script>
+</body>
+</html>
